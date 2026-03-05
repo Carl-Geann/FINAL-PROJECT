@@ -18,7 +18,7 @@ public class HotelBookingSystem extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // ===== LEFT PANEL =====
+        
         JPanel leftPanel = new JPanel();
         leftPanel.setPreferredSize(new Dimension(300, 500));
         leftPanel.setLayout(new GridLayout(10, 1, 5, 5));
@@ -46,7 +46,7 @@ public class HotelBookingSystem extends JFrame {
         leftPanel.add(btnEdit);
         leftPanel.add(btnDelete);
 
-        // ===== RIGHT PANEL =====
+        
         JPanel rightPanel = new JPanel(new BorderLayout());
 
         JPanel filterPanel = new JPanel();
@@ -73,12 +73,10 @@ public class HotelBookingSystem extends JFrame {
         add(leftPanel, BorderLayout.WEST);
         add(rightPanel, BorderLayout.CENTER);
 
-        // ===== SAMPLE DATA =====
-        model.addRow(new Object[]{1, "Heaven Room", "VIP", "Free", 2000});
-        model.addRow(new Object[]{2, "King Palace", "Double Bed", "Booked", 1800});
-        model.addRow(new Object[]{3, "Fam Suite 1", "Family", "Free", 2200});
+        
+        
 
-        // ===== BUTTON FUNCTIONS =====
+        
         btnAdd.addActionListener(e -> addRoom());
         btnEdit.addActionListener(e -> editRoom());
         btnDelete.addActionListener(e -> deleteRoom());
