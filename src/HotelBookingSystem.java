@@ -6,22 +6,22 @@ import java.awt.event.*;
 public class HotelBookingSystem extends JFrame {
 
     private JTextField txtName, txtPrice;
-    private JComboBox<String> cbCategory, cbStatus, cbFilterType, cbFilterStatus;
+    private JComboBox<String> cbCategory, cbStatus, cbPaymentMethod, cbFilterType, cbFilterStatus, cbFilterPayment;
     private JTable table;
     private DefaultTableModel model;
 
     public HotelBookingSystem() {
 
-        setTitle("Hotel Management System - Manage Rooms");
-        setSize(900, 500);
+        setTitle("Hotel Reservation List");
+        setSize(1100, 550);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
         
         JPanel leftPanel = new JPanel();
-        leftPanel.setPreferredSize(new Dimension(300, 500));
-        leftPanel.setLayout(new GridLayout(10, 1, 5, 5));
+        leftPanel.setPreferredSize(new Dimension(350, 550));
+        leftPanel.setLayout(new GridLayout(12, 1, 5, 5));
         leftPanel.setBorder(BorderFactory.createTitledBorder("Room Details"));
 
         txtName = new JTextField();
@@ -29,6 +29,7 @@ public class HotelBookingSystem extends JFrame {
 
         cbCategory = new JComboBox<>(new String[]{"VIP", "Double Bed", "Family"});
         cbStatus = new JComboBox<>(new String[]{"Free", "Booked"});
+        cbPaymentMethod = new JComboBox<>(new String[]{"Credit Card", "Debit Card", "Cash", "Online Transfer"});
 
         JButton btnAdd = new JButton("Add");
         JButton btnEdit = new JButton("Edit");
@@ -42,6 +43,8 @@ public class HotelBookingSystem extends JFrame {
         leftPanel.add(cbStatus);
         leftPanel.add(new JLabel("Price"));
         leftPanel.add(txtPrice);
+        leftPanel.add(new JLabel("Payment Method"));
+        leftPanel.add(cbPaymentMethod);
         leftPanel.add(btnAdd);
         leftPanel.add(btnEdit);
         leftPanel.add(btnDelete);
@@ -50,20 +53,25 @@ public class HotelBookingSystem extends JFrame {
         JPanel rightPanel = new JPanel(new BorderLayout());
 
         JPanel filterPanel = new JPanel();
+        filterPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
         cbFilterType = new JComboBox<>(new String[]{"All", "VIP", "Double Bed", "Family"});
         cbFilterStatus = new JComboBox<>(new String[]{"All", "Free", "Booked"});
+        cbFilterPayment = new JComboBox<>(new String[]{"All", "Credit Card", "Debit Card", "Cash", "Online Transfer"});
         JButton btnRefresh = new JButton("Refresh");
 
         filterPanel.add(new JLabel("Type:"));
         filterPanel.add(cbFilterType);
         filterPanel.add(new JLabel("Status:"));
         filterPanel.add(cbFilterStatus);
+        filterPanel.add(new JLabel("Payment:"));
+        filterPanel.add(cbFilterPayment);
         filterPanel.add(btnRefresh);
 
-        String[] columns = {"Room No", "Room Name", "Type", "Status", "Price"};
+        String[] columns = {"Room No", "Room Name", "Type", "Status", "Price", "Payment Method"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
+        table.setRowHeight(16); // Set default row height
 
         JScrollPane scrollPane = new JScrollPane(table);
 
@@ -72,9 +80,6 @@ public class HotelBookingSystem extends JFrame {
 
         add(leftPanel, BorderLayout.WEST);
         add(rightPanel, BorderLayout.CENTER);
-
-        
-        
 
         
         btnAdd.addActionListener(e -> addRoom());
@@ -89,8 +94,14 @@ public class HotelBookingSystem extends JFrame {
         String type = cbCategory.getSelectedItem().toString();
         String status = cbStatus.getSelectedItem().toString();
         String price = txtPrice.getText();
+        String paymentMethod = cbPaymentMethod.getSelectedItem().toString();
 
-        model.addRow(new Object[]{rowCount + 1, name, type, status, price});
+        if (name.isEmpty() || price.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields.");
+            return;
+        }
+
+        model.addRow(new Object[]{rowCount + 1, name, type, status, price, paymentMethod});
         clearFields();
     }
 
@@ -101,6 +112,7 @@ public class HotelBookingSystem extends JFrame {
             model.setValueAt(cbCategory.getSelectedItem(), selectedRow, 2);
             model.setValueAt(cbStatus.getSelectedItem(), selectedRow, 3);
             model.setValueAt(txtPrice.getText(), selectedRow, 4);
+            model.setValueAt(cbPaymentMethod.getSelectedItem(), selectedRow, 5);
         } else {
             JOptionPane.showMessageDialog(this, "Select a row to edit.");
         }
@@ -118,18 +130,30 @@ public class HotelBookingSystem extends JFrame {
     private void filterRooms() {
         String typeFilter = cbFilterType.getSelectedItem().toString();
         String statusFilter = cbFilterStatus.getSelectedItem().toString();
+        String paymentFilter = cbFilterPayment.getSelectedItem().toString();
 
+        // Reset all rows to visible first
+        for (int i = 0; i < table.getRowCount(); i++) {
+            table.setRowHeight(i, 16);
+        }
+
+        // Apply filters
         for (int i = 0; i < table.getRowCount(); i++) {
             boolean visible = true;
 
             String type = table.getValueAt(i, 2).toString();
             String status = table.getValueAt(i, 3).toString();
+            String payment = table.getValueAt(i, 5).toString();
 
             if (!typeFilter.equals("All") && !type.equals(typeFilter)) {
                 visible = false;
             }
 
             if (!statusFilter.equals("All") && !status.equals(statusFilter)) {
+                visible = false;
+            }
+
+            if (!paymentFilter.equals("All") && !payment.equals(paymentFilter)) {
                 visible = false;
             }
 
