@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 public class HotelBookingSystem extends JFrame {
@@ -12,6 +13,7 @@ public class HotelBookingSystem extends JFrame {
     private JComboBox<String> cbCategory, cbStatus, cbPaymentMethod, cbFilterType, cbFilterStatus, cbFilterPayment;
     private JTable table;
     private DefaultTableModel model;
+    private ArrayList<Room> rooms;
 
     public HotelBookingSystem() {
 
@@ -21,7 +23,7 @@ public class HotelBookingSystem extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         
-      
+        rooms = new ArrayList<>();
 
         
         JPanel leftPanel = new JPanel();
@@ -94,7 +96,6 @@ public class HotelBookingSystem extends JFrame {
     }
 
     private void addRoom() {
-        int rowCount = model.getRowCount();
         String name = txtName.getText();
         String type = cbCategory.getSelectedItem().toString();
         String status = cbStatus.getSelectedItem().toString();
@@ -106,18 +107,22 @@ public class HotelBookingSystem extends JFrame {
             return;
         }
 
-        model.addRow(new Object[]{rowCount + 1, name, type, status, price, paymentMethod});
+        Room room = new Room(rooms.size() + 1, name, type, status, price, paymentMethod);
+        rooms.add(room);
+        updateTable();
         clearFields();
     }
 
     private void editRoom() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow != -1) {
-            model.setValueAt(txtName.getText(), selectedRow, 1);
-            model.setValueAt(cbCategory.getSelectedItem(), selectedRow, 2);
-            model.setValueAt(cbStatus.getSelectedItem(), selectedRow, 3);
-            model.setValueAt(txtPrice.getText(), selectedRow, 4);
-            model.setValueAt(cbPaymentMethod.getSelectedItem(), selectedRow, 5);
+            Room room = rooms.get(selectedRow);
+            room.setName(txtName.getText());
+            room.setType(cbCategory.getSelectedItem().toString());
+            room.setStatus(cbStatus.getSelectedItem().toString());
+            room.setPrice(txtPrice.getText());
+            room.setPaymentMethod(cbPaymentMethod.getSelectedItem().toString());
+            updateTable();
         } else {
             JOptionPane.showMessageDialog(this, "Select a row to edit.");
         }
@@ -126,7 +131,8 @@ public class HotelBookingSystem extends JFrame {
     private void deleteRoom() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow != -1) {
-            model.removeRow(selectedRow);
+            rooms.remove(selectedRow);
+            updateTable();
         } else {
             JOptionPane.showMessageDialog(this, "Select a row to delete.");
         }
@@ -137,32 +143,35 @@ public class HotelBookingSystem extends JFrame {
         String statusFilter = cbFilterStatus.getSelectedItem().toString();
         String paymentFilter = cbFilterPayment.getSelectedItem().toString();
 
-       
-        for (int i = 0; i < table.getRowCount(); i++) {
-            table.setRowHeight(i, 16);
-        }
+        model.setRowCount(0);
 
-        
-        for (int i = 0; i < table.getRowCount(); i++) {
+        for (Room room : rooms) {
             boolean visible = true;
 
-            String type = table.getValueAt(i, 2).toString();
-            String status = table.getValueAt(i, 3).toString();
-            String payment = table.getValueAt(i, 5).toString();
-
-            if (!typeFilter.equals("All") && !type.equals(typeFilter)) {
+            if (!typeFilter.equals("All") && !room.getType().equals(typeFilter)) {
                 visible = false;
             }
 
-            if (!statusFilter.equals("All") && !status.equals(statusFilter)) {
+            if (!statusFilter.equals("All") && !room.getStatus().equals(statusFilter)) {
                 visible = false;
             }
 
-            if (!paymentFilter.equals("All") && !payment.equals(paymentFilter)) {
+            if (!paymentFilter.equals("All") && !room.getPaymentMethod().equals(paymentFilter)) {
                 visible = false;
             }
 
-            table.setRowHeight(i, visible ? 16 : 0);
+            if (visible) {
+                model.addRow(new Object[]{room.getRoomNo(), room.getName(), room.getType(), 
+                                          room.getStatus(), room.getPrice(), room.getPaymentMethod()});
+            }
+        }
+    }
+
+    private void updateTable() {
+        model.setRowCount(0);
+        for (Room room : rooms) {
+            model.addRow(new Object[]{room.getRoomNo(), room.getName(), room.getType(), 
+                                      room.getStatus(), room.getPrice(), room.getPaymentMethod()});
         }
     }
 
@@ -173,5 +182,67 @@ public class HotelBookingSystem extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new HotelBookingSystem().setVisible(true));
+    }
+}
+
+class Room {
+    private int roomNo;
+    private String name;
+    private String type;
+    private String status;
+    private String price;
+    private String paymentMethod;
+
+    public Room(int roomNo, String name, String type, String status, String price, String paymentMethod) {
+        this.roomNo = roomNo;
+        this.name = name;
+        this.type = type;
+        this.status = status;
+        this.price = price;
+        this.paymentMethod = paymentMethod;
+    }
+
+    public int getRoomNo() {
+        return roomNo;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }
