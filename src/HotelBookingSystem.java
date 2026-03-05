@@ -2,6 +2,9 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
 
 public class HotelBookingSystem extends JFrame {
 
@@ -17,6 +20,8 @@ public class HotelBookingSystem extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        
+      
 
         
         JPanel leftPanel = new JPanel();
@@ -71,7 +76,7 @@ public class HotelBookingSystem extends JFrame {
         String[] columns = {"Room No", "Room Name", "Type", "Status", "Price", "Payment Method"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
-        table.setRowHeight(16); // Set default row height
+        table.setRowHeight(16); 
 
         JScrollPane scrollPane = new JScrollPane(table);
 
@@ -132,12 +137,12 @@ public class HotelBookingSystem extends JFrame {
         String statusFilter = cbFilterStatus.getSelectedItem().toString();
         String paymentFilter = cbFilterPayment.getSelectedItem().toString();
 
-        // Reset all rows to visible first
+       
         for (int i = 0; i < table.getRowCount(); i++) {
             table.setRowHeight(i, 16);
         }
 
-        // Apply filters
+        
         for (int i = 0; i < table.getRowCount(); i++) {
             boolean visible = true;
 
