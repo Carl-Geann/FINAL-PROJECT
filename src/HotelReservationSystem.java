@@ -480,8 +480,6 @@ public class HotelReservationSystem extends JFrame {
         spBookingAt.setEnabled(false);
         currentSelected = null;
     }
-
-    void setUsers(Map<String, String> creds) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
 }
+
+   
