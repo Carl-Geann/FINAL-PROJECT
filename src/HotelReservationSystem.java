@@ -1,6 +1,7 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,7 +53,7 @@ public class HotelReservationSystem extends JFrame {
 
         btnRoomDetails = new JButton("Room Details");
         btnReservationList = new JButton("Reservation List");
-        Font headerFont = new Font(getFont().getName(), Font.BOLD, 14);
+        Font headerFont = baseFont().deriveFont(Font.BOLD, 14f);
         btnRoomDetails.setFont(headerFont);
         btnReservationList.setFont(headerFont);
         btnRoomDetails.setPreferredSize(new Dimension(180, 36));
@@ -92,8 +93,8 @@ public class HotelReservationSystem extends JFrame {
         detailsPanel.add(new JLabel("Booking Date/Time"));
         detailsPanel.add(spBookingAt);
 
-        Font labelFont = new Font(getFont().getName(), Font.PLAIN, 14);
-        Font fieldFont = new Font(getFont().getName(), Font.PLAIN, 14);
+        Font labelFont = baseFont().deriveFont(Font.PLAIN, 14f);
+        Font fieldFont = baseFont().deriveFont(Font.PLAIN, 14f);
         Dimension fieldSize = new Dimension(220, 36);
         cbRoomNo.setFont(fieldFont);
         txtName.setFont(fieldFont);
@@ -124,7 +125,7 @@ public class HotelReservationSystem extends JFrame {
         btnAdd = new JButton("Add");
         btnEdit = new JButton("Edit");
         btnDelete = new JButton("Delete");
-        Font actionFont = new Font(getFont().getName(), Font.BOLD, 14);
+        Font actionFont = baseFont().deriveFont(Font.BOLD, 14f);
         btnAdd.setFont(actionFont);
         btnEdit.setFont(actionFont);
         btnDelete.setFont(actionFont);
@@ -158,7 +159,7 @@ public class HotelReservationSystem extends JFrame {
         cbFilterStatus = new JComboBox<>(new String[]{"All", "Free", "Booked"});
         cbFilterPayment = new JComboBox<>(new String[]{"All", "Credit Card", "Debit Card", "Cash", "Online Transfer"});
         JButton btnRefresh = new JButton("Refresh");
-        Font filterFont = new Font(getFont().getName(), Font.PLAIN, 13);
+        Font filterFont = baseFont().deriveFont(Font.PLAIN, 13f);
         cbFilterType.setFont(filterFont);
         cbFilterStatus.setFont(filterFont);
         cbFilterPayment.setFont(filterFont);
@@ -180,8 +181,8 @@ public class HotelReservationSystem extends JFrame {
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
         table.setRowHeight(22);
-        table.getTableHeader().setFont(new Font(getFont().getName(), Font.BOLD, 13));
-        table.setFont(new Font(getFont().getName(), Font.PLAIN, 13));
+        table.getTableHeader().setFont(baseFont().deriveFont(Font.BOLD, 13f));
+        table.setFont(baseFont().deriveFont(Font.PLAIN, 13f));
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
         JScrollPane scrollPane = new JScrollPane(table);
@@ -220,29 +221,20 @@ public class HotelReservationSystem extends JFrame {
             mainSplit.setDividerLocation(0.28);
         });
 
-        btnAdd.addActionListener(new AddButtonHandler(
-                cbRoomNo, txtName, txtPrice, txtGuest,
-                cbCategory, cbStatus, cbPaymentMethod,
-                spBookingAt,
-                rooms, model,
-                this::refreshMapIfVisible
-        ));
+        btnAdd.addActionListener(e -> {
+            addRoom();
+            refreshMapIfVisible();
+        });
 
-        btnEdit.addActionListener(new EditButtonHandler(
-                cbRoomNo, txtName, txtPrice, txtGuest,
-                cbCategory, cbStatus, cbPaymentMethod,
-                spBookingAt,
-                table,
-                rooms, model,
-                this::refreshMapIfVisible
-        ));
+        btnEdit.addActionListener(e -> {
+            editRoom();
+            refreshMapIfVisible();
+        });
 
-        btnDelete.addActionListener(new DeleteButtonHandler(
-                cbRoomNo,
-                table,
-                rooms, model,
-                this::refreshMapIfVisible
-        ));
+        btnDelete.addActionListener(e -> {
+            deleteRoom();
+            refreshMapIfVisible();
+        });
 
         btnRefresh.addActionListener(e -> filterRooms());
 
@@ -254,11 +246,11 @@ public class HotelReservationSystem extends JFrame {
             }
         });
 
-        cbCategory.addActionListener(e -> RoomHelpers.updateRoomNoOptions(cbCategory, cbRoomNo));
+        cbCategory.addActionListener(e -> updateRoomNoOptions());
         cbRoomNo.addActionListener(e -> {
             Integer val = (Integer) cbRoomNo.getSelectedItem();
             if (val != null) {
-                Room r = RoomHelpers.findRoomByNo(rooms, val);
+                Room r = findRoomByNo(val);
                 if (r != null) {
                     selectRoomInForm(r);
                 }
@@ -280,7 +272,7 @@ public class HotelReservationSystem extends JFrame {
         users.put("staff@example.com", "staff123");
 
         seedInventory();
-        RoomHelpers.updateRoomNoOptions(cbCategory, cbRoomNo);
+        updateRoomNoOptions();
         updateTable();
         updateAuthUI();
         setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
@@ -317,6 +309,18 @@ public class HotelReservationSystem extends JFrame {
         btnSignOut.setEnabled(enabled);
         btnRoomDetails.setEnabled(true);
         btnReservationList.setEnabled(true);
+    }
+
+    public void showRoomDetailsOnLogin() {
+        updateRoomNoOptions();
+        cbCategory.setSelectedIndex(0);
+        int firstNo = rangeForType(cbCategory.getSelectedItem().toString())[0];
+        cbRoomNo.setSelectedItem(firstNo);
+        Room r = findRoomByNo(firstNo);
+        if (r != null) selectRoomInForm(r);
+        ((CardLayout) rightCards.getLayout()).show(rightCards, "table");
+        currentRightView = "table";
+        mainSplit.setDividerLocation(0.28);
     }
 
     private void refreshMapIfVisible() {
@@ -361,10 +365,10 @@ public class HotelReservationSystem extends JFrame {
         row.add(lbl, BorderLayout.NORTH);
 
         JPanel grid = new JPanel(new GridLayout(1, 10, 8, 8));
-        int[] range = RoomHelpers.rangeForType(type);
+        int[] range = rangeForType(type);
         for (int i = range[0]; i <= range[1]; i++) {
             String label = base + " " + (i - range[0] + 1);
-            Room r = RoomHelpers.findRoomByNo(rooms, i);
+            Room r = findRoomByNo(i);
             JButton tile = new JButton(label);
             tile.setPreferredSize(new Dimension(120, 60));
             tile.setForeground(Color.WHITE);
@@ -387,7 +391,7 @@ public class HotelReservationSystem extends JFrame {
     private void selectRoomInForm(Room r) {
         currentSelected = r;
         cbCategory.setSelectedItem(r.getType());
-        RoomHelpers.updateRoomNoOptions(cbCategory, cbRoomNo);
+        updateRoomNoOptions();
         cbRoomNo.setSelectedItem(r.getRoomNo());
         txtName.setText(r.getName());
         cbStatus.setSelectedItem(r.getStatus());
@@ -411,6 +415,7 @@ public class HotelReservationSystem extends JFrame {
                 signedIn = true;
                 currentUser = email;
                 updateAuthUI();
+                showRoomDetailsOnLogin();
                 setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
                 JOptionPane.showMessageDialog(this, "Signed in as " + email);
             }
@@ -436,6 +441,7 @@ public class HotelReservationSystem extends JFrame {
             signedIn = true;
             currentUser = email;
             updateAuthUI();
+            showRoomDetailsOnLogin();
             setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
             setVisible(true);
             JOptionPane.showMessageDialog(this, "Signed in as " + email);
@@ -474,6 +480,235 @@ public class HotelReservationSystem extends JFrame {
     }
 
     private void updateTable() {
-        RoomHelpers.refreshTable(model, rooms);
+        model.setRowCount(0);
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        for (Room room : rooms) {
+            String bookedStr = room.getBookedAt() != null ? fmt.format(room.getBookedAt()) : "";
+            model.addRow(new Object[]{
+                    room.getRoomNo(),
+                    room.getName(),
+                    room.getGuestName(),
+                    room.getType(),
+                    room.getStatus(),
+                    room.getPrice(),
+                    room.getPaymentMethod(),
+                    bookedStr
+            });
+        }
+    }
+
+    private void addRoom() {
+        String name = txtName.getText();
+        String type = cbCategory.getSelectedItem().toString();
+        String status = cbStatus.getSelectedItem().toString();
+        String price = txtPrice.getText();
+        String paymentMethod = cbPaymentMethod.getSelectedItem().toString();
+        String guestName = txtGuest.getText().trim();
+        Integer roomNoVal = (Integer) cbRoomNo.getSelectedItem();
+
+        if (name.isEmpty() || price.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields.");
+            return;
+        }
+        if (roomNoVal == null) {
+            JOptionPane.showMessageDialog(this, "Select a Room No.");
+            return;
+        }
+
+        try { spBookingAt.commitEdit(); } catch (ParseException ignored) {}
+        Date bookedAt = "Booked".equals(status) ? (Date) spBookingAt.getValue() : null;
+
+        Room target = findRoomByNo(roomNoVal);
+        if (target != null) {
+            target.setName(name);
+            target.setType(type);
+            target.setStatus(status);
+            target.setPrice(price);
+            target.setPaymentMethod(paymentMethod);
+            target.setGuestName(guestName);
+            target.setBookedAt(bookedAt);
+        } else {
+            Room room = new Room(roomNoVal, name, type, status, price, paymentMethod, bookedAt);
+            room.setGuestName(guestName);
+            rooms.add(room);
+        }
+
+        updateTable();
+        clearFields();
+    }
+
+    private void editRoom() {
+        Integer prefill = (Integer) cbRoomNo.getSelectedItem();
+        if (prefill == null && table.getSelectedRow() != -1) {
+            try {
+                prefill = Integer.parseInt(table.getValueAt(table.getSelectedRow(), 0).toString());
+            } catch (Exception ignored) {}
+        }
+        String input = (String) JOptionPane.showInputDialog(
+                this,
+                "Enter Room No to edit:",
+                "Edit Which Room",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                null,
+                prefill != null ? prefill.toString() : ""
+        );
+        if (input == null) return;
+        int targetNo;
+        try { targetNo = Integer.parseInt(input.trim()); }
+        catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Invalid Room No");
+            return;
+        }
+
+        Room room = findRoomByNo(targetNo);
+        if (room == null) {
+            JOptionPane.showMessageDialog(this, "Room No " + targetNo + " not found");
+            return;
+        }
+
+        int ok = JOptionPane.showConfirmDialog(
+                this,
+                "Edit room " + targetNo + " (" + room.getName() + ")?",
+                "Confirm Edit",
+                JOptionPane.OK_CANCEL_OPTION
+        );
+        if (ok != JOptionPane.OK_OPTION) return;
+
+        room.setName(txtName.getText());
+        room.setType(cbCategory.getSelectedItem().toString());
+        room.setStatus(cbStatus.getSelectedItem().toString());
+        room.setPrice(txtPrice.getText());
+        room.setPaymentMethod(cbPaymentMethod.getSelectedItem().toString());
+        room.setGuestName(txtGuest.getText().trim());
+        try { spBookingAt.commitEdit(); } catch (ParseException ignored) {}
+        Date bookedAt = "Booked".equals(cbStatus.getSelectedItem().toString()) ? (Date) spBookingAt.getValue() : null;
+        room.setBookedAt(bookedAt);
+
+        updateTable();
+        JOptionPane.showMessageDialog(this, "Edit confirmed");
+    }
+
+    private void deleteRoom() {
+        int viewRow = table.getSelectedRow();
+        Integer roomNoVal = (Integer) cbRoomNo.getSelectedItem();
+        int targetNo = -1;
+
+        if (roomNoVal != null) {
+            targetNo = roomNoVal;
+        } else if (viewRow != -1) {
+            try {
+                targetNo = Integer.parseInt(table.getValueAt(viewRow, 0).toString());
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Select a valid row");
+                return;
+            }
+        } else {
+            String input = (String) JOptionPane.showInputDialog(
+                    this,
+                    "Enter Room No to empty:",
+                    "Empty Which Row",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    null,
+                    ""
+            );
+            if (input == null) return;
+            try { targetNo = Integer.parseInt(input.trim()); }
+            catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Invalid Room No");
+                return;
+            }
+        }
+
+        Room room = findRoomByNo(targetNo);
+        if (room == null) {
+            JOptionPane.showMessageDialog(this, "Room No " + targetNo + " not found");
+            return;
+        }
+
+        int ok = JOptionPane.showConfirmDialog(
+                this,
+                "Empty row " + targetNo + " (" + room.getName() + ")?",
+                "Confirm Empty",
+                JOptionPane.OK_CANCEL_OPTION
+        );
+        if (ok != JOptionPane.OK_OPTION) return;
+
+        emptyRoom(room);
+        updateTable();
+        cbRoomNo.setSelectedItem(targetNo);
+        JOptionPane.showMessageDialog(this, "Row " + targetNo + " emptied");
+    }
+
+    private void clearFields() {
+        cbRoomNo.setSelectedIndex(-1);
+        txtName.setText("");
+        txtPrice.setText("");
+        txtGuest.setText("");
+        cbCategory.setSelectedIndex(0);
+        updateRoomNoOptions();
+        cbStatus.setSelectedIndex(0);
+        cbPaymentMethod.setSelectedIndex(0);
+        spBookingAt.setValue(new Date());
+        spBookingAt.setEnabled(false);
+        currentSelected = null;
+    }
+
+    private Room findRoomByNo(int roomNo) {
+        for (Room r : rooms) {
+            if (r.getRoomNo() == roomNo) return r;
+        }
+        return null;
+    }
+
+    private String defaultPriceForType(String type) {
+        if ("VIP".equals(type)) return "100";
+        if ("Family".equals(type)) return "80";
+        return "60";
+    }
+
+    private String baseForType(String type) {
+        if ("VIP".equals(type)) return "VIP";
+        if ("Family".equals(type)) return "Family";
+        return "Double";
+    }
+
+    private int[] rangeForType(String type) {
+        if ("VIP".equalsIgnoreCase(type)) return new int[]{1, 10};
+        if ("Family".equalsIgnoreCase(type)) return new int[]{11, 20};
+        if ("Double Bed".equalsIgnoreCase(type)) return new int[]{21, 30};
+        return new int[]{1, 30};
+    }
+
+    private int indexForTypeRoomNo(String type, int roomNo) {
+        int[] r = rangeForType(type);
+        return roomNo - r[0] + 1;
+    }
+
+    private void emptyRoom(Room room) {
+        room.setGuestName("");
+        room.setBookedAt(null);
+        room.setStatus("Free");
+        room.setPaymentMethod("Cash");
+        room.setPrice(defaultPriceForType(room.getType()));
+        int idx = indexForTypeRoomNo(room.getType(), room.getRoomNo());
+        room.setName(baseForType(room.getType()) + " " + idx);
+    }
+
+    private void updateRoomNoOptions() {
+        cbRoomNo.removeAllItems();
+        Object sel = cbCategory.getSelectedItem();
+        String type = sel == null ? "" : sel.toString();
+        int[] range = rangeForType(type);
+        for (int i = range[0]; i <= range[1]; i++) cbRoomNo.addItem(i);
+        cbRoomNo.setSelectedIndex(-1);
+    }
+
+    private Font baseFont() {
+        Font f = getFont();
+        if (f == null) f = UIManager.getFont("Label.font");
+        if (f == null) f = new Font("Dialog", Font.PLAIN, 12);
+        return f;
     }
 }
