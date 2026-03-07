@@ -8,6 +8,7 @@ public class Room {
     private String price;
     private String paymentMethod;
     private Date bookedAt;
+    private String guestName;
 
     public Room(int roomNo, String name, String type, String status, String price, String paymentMethod, Date bookedAt) {
         this.roomNo = roomNo;
@@ -32,4 +33,6 @@ public class Room {
     public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
     public Date getBookedAt() { return bookedAt; }
     public void setBookedAt(Date bookedAt) { this.bookedAt = bookedAt; }
+    public String getGuestName() { return guestName; }
+    public void setGuestName(String guestName) { this.guestName = guestName; }
 }
