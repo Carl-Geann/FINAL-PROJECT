@@ -21,27 +21,22 @@ public class HotelReservationSystem extends JFrame {
 
     private JButton btnAdd, btnEdit, btnDelete;
     private JLabel lblUser;
-    private JButton btnSignOut;
+    private JButton btnExit;
 
     private JSpinner spBookingAt;
 
     private JButton btnRoomDetails;
-    private JButton btnReservationList;
     private JPanel detailsPanel;
     private JPanel actionsPanel;
     private JPanel leftStack;
 
     private JSplitPane mainSplit;
 
-    private JPanel rightCards;
-    private JPanel mapPanel;
-
-    private String currentRightView = "table";
     private Room currentSelected;
 
     public HotelReservationSystem() {
         setTitle("Hotel Reservation List");
-        setSize(1100, 550);
+        setSize(1200, 700);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -49,20 +44,18 @@ public class HotelReservationSystem extends JFrame {
         rooms = new ArrayList<>();
 
         JPanel leftPanel = new JPanel(new BorderLayout());
-        leftPanel.setBorder(BorderFactory.createEmptyBorder(6, 6, 6, 6));
+        leftPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         btnRoomDetails = new JButton("Room Details");
-        btnReservationList = new JButton("Reservation List");
-        Font headerFont = baseFont().deriveFont(Font.BOLD, 14f);
-        btnRoomDetails.setFont(headerFont);
-        btnReservationList.setFont(headerFont);
-        btnRoomDetails.setPreferredSize(new Dimension(180, 36));
-        btnReservationList.setPreferredSize(new Dimension(180, 36));
-        JPanel headerButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        headerButtons.add(btnRoomDetails);
-        headerButtons.add(btnReservationList);
+        btnRoomDetails.setPreferredSize(new Dimension(150, 35));
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        headerPanel.add(btnRoomDetails);
 
-        detailsPanel = new JPanel(new GridLayout(15, 1, 5, 5));
+        detailsPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 0, 8, 15);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         cbRoomNo = new JComboBox<>();
         txtName = new JTextField();
@@ -76,98 +69,65 @@ public class HotelReservationSystem extends JFrame {
         spBookingAt = new JSpinner(new SpinnerDateModel(new Date(), null, null, java.util.Calendar.MINUTE));
         spBookingAt.setEditor(new JSpinner.DateEditor(spBookingAt, "yyyy-MM-dd HH:mm"));
 
-        detailsPanel.add(new JLabel("Room No"));
-        detailsPanel.add(cbRoomNo);
-        detailsPanel.add(new JLabel("Room"));
-        detailsPanel.add(txtName);
-        detailsPanel.add(new JLabel("Category"));
-        detailsPanel.add(cbCategory);
-        detailsPanel.add(new JLabel("Status"));
-        detailsPanel.add(cbStatus);
-        detailsPanel.add(new JLabel("Price"));
-        detailsPanel.add(txtPrice);
-        detailsPanel.add(new JLabel("Payment Method"));
-        detailsPanel.add(cbPaymentMethod);
-        detailsPanel.add(new JLabel("Guest Name"));
-        detailsPanel.add(txtGuest);
-        detailsPanel.add(new JLabel("Booking Date/Time"));
-        detailsPanel.add(spBookingAt);
+        String[] labels = {"Room No", "Room", "Category", "Status", "Price", "Payment Method", "Guest Name", "Booking Date/Time"};
+        JComponent[] fields = {cbRoomNo, txtName, cbCategory, cbStatus, txtPrice, cbPaymentMethod, txtGuest, spBookingAt};
 
-        Font labelFont = baseFont().deriveFont(Font.PLAIN, 14f);
-        Font fieldFont = baseFont().deriveFont(Font.PLAIN, 14f);
-        Dimension fieldSize = new Dimension(220, 36);
-        cbRoomNo.setFont(fieldFont);
-        txtName.setFont(fieldFont);
-        cbCategory.setFont(fieldFont);
-        cbStatus.setFont(fieldFont);
-        txtPrice.setFont(fieldFont);
-        cbPaymentMethod.setFont(fieldFont);
-        txtGuest.setFont(fieldFont);
-        spBookingAt.setFont(fieldFont);
-        ((JSpinner.DefaultEditor) spBookingAt.getEditor()).getTextField().setFont(fieldFont);
-        cbRoomNo.setPreferredSize(fieldSize);
-        txtName.setPreferredSize(fieldSize);
-        cbCategory.setPreferredSize(fieldSize);
-        cbStatus.setPreferredSize(fieldSize);
-        txtPrice.setPreferredSize(fieldSize);
-        cbPaymentMethod.setPreferredSize(fieldSize);
-        txtGuest.setPreferredSize(fieldSize);
-        spBookingAt.setPreferredSize(fieldSize);
-        for (Component c : detailsPanel.getComponents()) {
-            if (c instanceof JLabel) c.setFont(labelFont);
+        for (int i = 0; i < labels.length; i++) {
+            gbc.gridx = 0;
+            gbc.gridy = i;
+            gbc.weightx = 0;
+            detailsPanel.add(new JLabel(labels[i]), gbc);
+
+            gbc.gridx = 1;
+            gbc.weightx = 1.0;
+            fields[i].setPreferredSize(new Dimension(200, 30));
+            detailsPanel.add(fields[i], gbc);
         }
 
         actionsPanel = new JPanel(new GridBagLayout());
         GridBagConstraints agc = new GridBagConstraints();
-        agc.insets = new Insets(4, 0, 4, 0);
+        agc.insets = new Insets(10, 0, 10, 0);
         agc.fill = GridBagConstraints.HORIZONTAL;
 
         btnAdd = new JButton("Add");
         btnEdit = new JButton("Edit");
         btnDelete = new JButton("Delete");
-        Font actionFont = baseFont().deriveFont(Font.BOLD, 14f);
-        btnAdd.setFont(actionFont);
-        btnEdit.setFont(actionFont);
-        btnDelete.setFont(actionFont);
-        btnAdd.setPreferredSize(new Dimension(140, 40));
-        btnEdit.setPreferredSize(new Dimension(140, 40));
-        btnDelete.setPreferredSize(new Dimension(240, 46));
 
-        JPanel row1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        row1.add(btnAdd);
-        row1.add(btnEdit);
+        btnAdd.setPreferredSize(new Dimension(145, 45));
+        btnEdit.setPreferredSize(new Dimension(145, 45));
+        btnDelete.setPreferredSize(new Dimension(300, 45));
+
+        Font btnFont = new Font("SansSerif", Font.BOLD, 14);
+        btnAdd.setFont(btnFont);
+        btnEdit.setFont(btnFont);
+        btnDelete.setFont(btnFont);
+
+        JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        btnRow.add(btnAdd);
+        btnRow.add(btnEdit);
 
         agc.gridx = 0;
         agc.gridy = 0;
-        actionsPanel.add(row1, agc);
+        actionsPanel.add(btnRow, agc);
 
-        agc.gridx = 0;
         agc.gridy = 1;
         actionsPanel.add(btnDelete, agc);
 
-        leftStack = new JPanel(new BorderLayout(0, 8));
-        leftStack.add(detailsPanel, BorderLayout.CENTER);
-        leftStack.add(actionsPanel, BorderLayout.SOUTH);
+        leftStack = new JPanel(new BorderLayout(0, 20));
+        leftStack.add(detailsPanel, BorderLayout.NORTH);
+        leftStack.add(actionsPanel, BorderLayout.CENTER);
 
-        leftPanel.add(headerButtons, BorderLayout.NORTH);
+        leftPanel.add(headerPanel, BorderLayout.NORTH);
         leftPanel.add(leftStack, BorderLayout.CENTER);
 
         JPanel rightPanel = new JPanel(new BorderLayout());
+        rightPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         cbFilterType = new JComboBox<>(new String[]{"All", "VIP", "Double Bed", "Family"});
         cbFilterStatus = new JComboBox<>(new String[]{"All", "Free", "Booked"});
         cbFilterPayment = new JComboBox<>(new String[]{"All", "Credit Card", "Debit Card", "Cash", "Online Transfer"});
         JButton btnRefresh = new JButton("Refresh");
-        Font filterFont = baseFont().deriveFont(Font.PLAIN, 13f);
-        cbFilterType.setFont(filterFont);
-        cbFilterStatus.setFont(filterFont);
-        cbFilterPayment.setFont(filterFont);
-        cbFilterType.setPreferredSize(new Dimension(130, 32));
-        cbFilterStatus.setPreferredSize(new Dimension(130, 32));
-        cbFilterPayment.setPreferredSize(new Dimension(150, 32));
-        btnRefresh.setFont(actionFont);
-        btnRefresh.setPreferredSize(new Dimension(100, 34));
 
         filterPanel.add(new JLabel("Type:"));
         filterPanel.add(cbFilterType);
@@ -180,24 +140,18 @@ public class HotelReservationSystem extends JFrame {
         String[] columns = {"Room No", "Room Name", "Guest Name", "Type", "Status", "Price", "Payment Method", "Booked At"};
         model = new DefaultTableModel(columns, 0);
         table = new JTable(model);
-        table.setRowHeight(22);
-        table.getTableHeader().setFont(baseFont().deriveFont(Font.BOLD, 13f));
-        table.setFont(baseFont().deriveFont(Font.PLAIN, 13f));
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        table.setRowHeight(25);
+        table.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 12));
+        table.setShowGrid(true);
+        table.setGridColor(Color.LIGHT_GRAY);
 
         JScrollPane scrollPane = new JScrollPane(table);
-
-        rightCards = new JPanel(new CardLayout());
-        JPanel tableCard = new JPanel(new BorderLayout());
-        tableCard.add(scrollPane, BorderLayout.CENTER);
-        rightCards.add(tableCard, "table");
-
         rightPanel.add(filterPanel, BorderLayout.NORTH);
-        rightPanel.add(rightCards, BorderLayout.CENTER);
+        rightPanel.add(scrollPane, BorderLayout.CENTER);
 
         mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
+        mainSplit.setDividerLocation(400);
         mainSplit.setContinuousLayout(true);
-        mainSplit.setResizeWeight(0.28);
         add(mainSplit, BorderLayout.CENTER);
 
         btnRoomDetails.addActionListener(e -> {
@@ -205,37 +159,11 @@ public class HotelReservationSystem extends JFrame {
             cbFilterStatus.setSelectedItem("All");
             cbFilterPayment.setSelectedIndex(0);
             filterRooms();
-            ((CardLayout) rightCards.getLayout()).show(rightCards, "table");
-            currentRightView = "table";
-            mainSplit.setDividerLocation(0.28);
         });
 
-        btnReservationList.addActionListener(e -> {
-            cbFilterType.setSelectedIndex(0);
-            cbFilterStatus.setSelectedItem("All");
-            cbFilterPayment.setSelectedIndex(0);
-            mapPanel = buildMapPanel();
-            rightCards.add(mapPanel, "map");
-            ((CardLayout) rightCards.getLayout()).show(rightCards, "map");
-            currentRightView = "map";
-            mainSplit.setDividerLocation(0.28);
-        });
-
-        btnAdd.addActionListener(e -> {
-            addRoom();
-            refreshMapIfVisible();
-        });
-
-        btnEdit.addActionListener(e -> {
-            editRoom();
-            refreshMapIfVisible();
-        });
-
-        btnDelete.addActionListener(e -> {
-            deleteRoom();
-            refreshMapIfVisible();
-        });
-
+        btnAdd.addActionListener(e -> addRoom());
+        btnEdit.addActionListener(e -> editRoom());
+        btnDelete.addActionListener(e -> deleteRoom());
         btnRefresh.addActionListener(e -> filterRooms());
 
         cbStatus.addActionListener(e -> {
@@ -257,15 +185,13 @@ public class HotelReservationSystem extends JFrame {
             }
         });
 
-        setJMenuBar(createMenuBar());
-
         JPanel footer = new JPanel(new BorderLayout());
-        footer.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
+        footer.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
         lblUser = new JLabel("Signed out");
-        btnSignOut = new JButton("Sign Out");
-        btnSignOut.addActionListener(e -> signOut());
+        btnExit = new JButton("Exit");
+        btnExit.addActionListener(e -> System.exit(0));
         footer.add(lblUser, BorderLayout.WEST);
-        footer.add(btnSignOut, BorderLayout.EAST);
+        footer.add(btnExit, BorderLayout.EAST);
         add(footer, BorderLayout.SOUTH);
 
         users.put("geann@gmail.com", "geann123");
@@ -306,86 +232,23 @@ public class HotelReservationSystem extends JFrame {
         btnEdit.setEnabled(enabled);
         btnDelete.setEnabled(enabled);
         lblUser.setText(enabled ? ("Signed in as " + currentUser) : "Signed out");
-        btnSignOut.setEnabled(enabled);
+        btnExit.setEnabled(enabled);
         btnRoomDetails.setEnabled(true);
-        btnReservationList.setEnabled(true);
-    }
-
-    public void showRoomDetailsOnLogin() {
-        updateRoomNoOptions();
-        cbCategory.setSelectedIndex(0);
-        int firstNo = rangeForType(cbCategory.getSelectedItem().toString())[0];
-        cbRoomNo.setSelectedItem(firstNo);
-        Room r = findRoomByNo(firstNo);
-        if (r != null) selectRoomInForm(r);
-        ((CardLayout) rightCards.getLayout()).show(rightCards, "table");
-        currentRightView = "table";
-        mainSplit.setDividerLocation(0.28);
-    }
-
-    private void refreshMapIfVisible() {
-        if ("map".equals(currentRightView)) {
-            mapPanel = buildMapPanel();
-            rightCards.add(mapPanel, "map");
-            ((CardLayout) rightCards.getLayout()).show(rightCards, "map");
-        }
     }
 
     private void seedInventory() {
-        for (int i = 1; i <= 10; i++) {
-            rooms.add(new Room(i, "VIP " + i, "VIP", "Free", "100", "Cash", null));
-        }
-        for (int i = 11; i <= 20; i++) {
-            rooms.add(new Room(i, "Family " + (i - 10), "Family", "Free", "80", "Cash", null));
-        }
-        for (int i = 21; i <= 30; i++) {
-            rooms.add(new Room(i, "Double " + (i - 20), "Double Bed", "Free", "60", "Cash", null));
-        }
+        seedType("VIP", "VIP", 10, "100");
+        seedType("Family", "Family", 10, "80");
+        seedType("Double Bed", "Double", 10, "60");
     }
 
-    private JPanel buildMapPanel() {
-        JPanel overlay = new JPanel(new GridBagLayout());
-        overlay.setBackground(Color.WHITE);
-        GridBagConstraints g = new GridBagConstraints();
-        g.insets = new Insets(10, 10, 10, 10);
-        g.gridx = 0;
-        g.gridy = 0;
-        overlay.add(buildRow("VIP", "VIP"), g);
-        g.gridy = 1;
-        overlay.add(buildRow("Family", "Family"), g);
-        g.gridy = 2;
-        overlay.add(buildRow("Double Bed", "Double"), g);
-        return overlay;
-    }
-
-    private JPanel buildRow(String type, String base) {
-        JPanel row = new JPanel(new BorderLayout());
-        JLabel lbl = new JLabel(type);
-        lbl.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
-        row.add(lbl, BorderLayout.NORTH);
-
-        JPanel grid = new JPanel(new GridLayout(1, 10, 8, 8));
-        int[] range = rangeForType(type);
-        for (int i = range[0]; i <= range[1]; i++) {
-            String label = base + " " + (i - range[0] + 1);
-            Room r = findRoomByNo(i);
-            JButton tile = new JButton(label);
-            tile.setPreferredSize(new Dimension(120, 60));
-            tile.setForeground(Color.WHITE);
-            if (r != null) {
-                Color freeColor = new Color(0, 160, 0);
-                Color bookedColor = new Color(200, 0, 0);
-                tile.setBackground("Free".equals(r.getStatus()) ? freeColor : bookedColor);
-                tile.setEnabled(true);
-                tile.addActionListener(e -> selectRoomInForm(r));
-            } else {
-                tile.setBackground(new Color(180, 180, 180));
-                tile.setEnabled(false);
+    private void seedType(String type, String base, int count, String price) {
+        for (int i = 1; i <= count; i++) {
+            String name = base + " " + i;
+            if (findRoomByName(name) == null) {
+                rooms.add(new Room(nextRoomNo(), name, type, "Free", price, "Cash", null));
             }
-            grid.add(tile);
         }
-        row.add(grid, BorderLayout.CENTER);
-        return row;
     }
 
     private void selectRoomInForm(Room r) {
@@ -403,98 +266,32 @@ public class HotelReservationSystem extends JFrame {
         }
     }
 
-    private JMenuBar createMenuBar() {
-        JMenuBar mb = new JMenuBar();
-        JMenu account = new JMenu("Account");
-        JMenuItem miSignIn = new JMenuItem("Sign In");
-        JMenuItem miSignOut = new JMenuItem("Sign Out");
-        JMenuItem miExit = new JMenuItem("Exit");
-        miSignIn.addActionListener(e -> {
-            String email = LoginDialog.show(this, users);
-            if (email != null) {
-                signedIn = true;
-                currentUser = email;
-                updateAuthUI();
-                showRoomDetailsOnLogin();
-                setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
-                JOptionPane.showMessageDialog(this, "Signed in as " + email);
-            }
-        });
-        miSignOut.addActionListener(e -> signOut());
-        miExit.addActionListener(e -> System.exit(0));
-        account.add(miSignIn);
-        account.add(miSignOut);
-        account.addSeparator();
-        account.add(miExit);
-        mb.add(account);
-        return mb;
-    }
-
-    private void signOut() {
-        signedIn = false;
-        currentUser = null;
-        updateAuthUI();
-        JOptionPane.showMessageDialog(this, "Signed out");
-        setVisible(false);
-        String email = LoginDialog.show(null, users);
-        if (email != null) {
-            signedIn = true;
-            currentUser = email;
-            updateAuthUI();
-            showRoomDetailsOnLogin();
-            setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
-            setVisible(true);
-            JOptionPane.showMessageDialog(this, "Signed in as " + email);
-        } else {
-            System.exit(0);
-        }
-    }
-
-    private void filterRooms() {
-        String typeFilter = cbFilterType.getSelectedItem().toString();
-        String statusFilter = cbFilterStatus.getSelectedItem().toString();
-        String paymentFilter = cbFilterPayment.getSelectedItem().toString();
-
-        model.setRowCount(0);
-        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-
-        for (Room room : rooms) {
-            boolean visible = true;
-            if (!typeFilter.equals("All") && !room.getType().equals(typeFilter)) visible = false;
-            if (!statusFilter.equals("All") && !room.getStatus().equals(statusFilter)) visible = false;
-            if (!paymentFilter.equals("All") && !room.getPaymentMethod().equals(paymentFilter)) visible = false;
-            if (visible) {
-                String bookedStr = room.getBookedAt() != null ? fmt.format(room.getBookedAt()) : "";
-                model.addRow(new Object[]{
-                        room.getRoomNo(),
-                        room.getName(),
-                        room.getGuestName(),
-                        room.getType(),
-                        room.getStatus(),
-                        room.getPrice(),
-                        room.getPaymentMethod(),
-                        bookedStr
-                });
+    private Room findRoomByNo(int roomNo) {
+        for (Room r : rooms) {
+            if (r.getRoomNo() == roomNo) {
+                return r;
             }
         }
+        return null;
     }
 
-    private void updateTable() {
-        model.setRowCount(0);
-        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        for (Room room : rooms) {
-            String bookedStr = room.getBookedAt() != null ? fmt.format(room.getBookedAt()) : "";
-            model.addRow(new Object[]{
-                    room.getRoomNo(),
-                    room.getName(),
-                    room.getGuestName(),
-                    room.getType(),
-                    room.getStatus(),
-                    room.getPrice(),
-                    room.getPaymentMethod(),
-                    bookedStr
-            });
+    private Room findRoomByName(String name) {
+        for (Room r : rooms) {
+            if (r.getName().equals(name)) {
+                return r;
+            }
         }
+        return null;
+    }
+
+    private int nextRoomNo() {
+        int max = 0;
+        for (Room r : rooms) {
+            if (r.getRoomNo() > max) {
+                max = r.getRoomNo();
+            }
+        }
+        return max + 1;
     }
 
     private void addRoom() {
@@ -515,7 +312,10 @@ public class HotelReservationSystem extends JFrame {
             return;
         }
 
-        try { spBookingAt.commitEdit(); } catch (ParseException ignored) {}
+        try {
+            spBookingAt.commitEdit();
+        } catch (ParseException ignored) {
+        }
         Date bookedAt = "Booked".equals(status) ? (Date) spBookingAt.getValue() : null;
 
         Room target = findRoomByNo(roomNoVal);
@@ -542,7 +342,8 @@ public class HotelReservationSystem extends JFrame {
         if (prefill == null && table.getSelectedRow() != -1) {
             try {
                 prefill = Integer.parseInt(table.getValueAt(table.getSelectedRow(), 0).toString());
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         String input = (String) JOptionPane.showInputDialog(
                 this,
@@ -553,10 +354,13 @@ public class HotelReservationSystem extends JFrame {
                 null,
                 prefill != null ? prefill.toString() : ""
         );
-        if (input == null) return;
+        if (input == null) {
+            return; // canceled
+        }
         int targetNo;
-        try { targetNo = Integer.parseInt(input.trim()); }
-        catch (NumberFormatException ex) {
+        try {
+            targetNo = Integer.parseInt(input.trim());
+        } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Invalid Room No");
             return;
         }
@@ -573,7 +377,9 @@ public class HotelReservationSystem extends JFrame {
                 "Confirm Edit",
                 JOptionPane.OK_CANCEL_OPTION
         );
-        if (ok != JOptionPane.OK_OPTION) return;
+        if (ok != JOptionPane.OK_OPTION) {
+            return;
+        }
 
         room.setName(txtName.getText());
         room.setType(cbCategory.getSelectedItem().toString());
@@ -581,7 +387,11 @@ public class HotelReservationSystem extends JFrame {
         room.setPrice(txtPrice.getText());
         room.setPaymentMethod(cbPaymentMethod.getSelectedItem().toString());
         room.setGuestName(txtGuest.getText().trim());
-        try { spBookingAt.commitEdit(); } catch (ParseException ignored) {}
+
+        try {
+            spBookingAt.commitEdit();
+        } catch (ParseException ignored) {
+        }
         Date bookedAt = "Booked".equals(cbStatus.getSelectedItem().toString()) ? (Date) spBookingAt.getValue() : null;
         room.setBookedAt(bookedAt);
 
@@ -613,9 +423,12 @@ public class HotelReservationSystem extends JFrame {
                     null,
                     ""
             );
-            if (input == null) return;
-            try { targetNo = Integer.parseInt(input.trim()); }
-            catch (NumberFormatException ex) {
+            if (input == null) {
+                return;
+            }
+            try {
+                targetNo = Integer.parseInt(input.trim());
+            } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Invalid Room No");
                 return;
             }
@@ -633,12 +446,68 @@ public class HotelReservationSystem extends JFrame {
                 "Confirm Empty",
                 JOptionPane.OK_CANCEL_OPTION
         );
-        if (ok != JOptionPane.OK_OPTION) return;
+        if (ok != JOptionPane.OK_OPTION) {
+            return;
+        }
 
         emptyRoom(room);
         updateTable();
         cbRoomNo.setSelectedItem(targetNo);
         JOptionPane.showMessageDialog(this, "Row " + targetNo + " emptied");
+    }
+
+    private void filterRooms() {
+        String typeFilter = cbFilterType.getSelectedItem().toString();
+        String statusFilter = cbFilterStatus.getSelectedItem().toString();
+        String paymentFilter = cbFilterPayment.getSelectedItem().toString();
+
+        model.setRowCount(0);
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+        for (Room room : rooms) {
+            boolean visible = true;
+            if (!typeFilter.equals("All") && !room.getType().equals(typeFilter)) {
+                visible = false;
+            }
+            if (!statusFilter.equals("All") && !room.getStatus().equals(statusFilter)) {
+                visible = false;
+            }
+            if (!paymentFilter.equals("All") && !room.getPaymentMethod().equals(paymentFilter)) {
+                visible = false;
+            }
+
+            if (visible) {
+                String bookedStr = room.getBookedAt() != null ? fmt.format(room.getBookedAt()) : "";
+                model.addRow(new Object[]{
+                    room.getRoomNo(),
+                    room.getName(),
+                    room.getGuestName(),
+                    room.getType(),
+                    room.getStatus(),
+                    room.getPrice(),
+                    room.getPaymentMethod(),
+                    bookedStr
+                });
+            }
+        }
+    }
+
+    private void updateTable() {
+        model.setRowCount(0);
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        for (Room room : rooms) {
+            String bookedStr = room.getBookedAt() != null ? fmt.format(room.getBookedAt()) : "";
+            model.addRow(new Object[]{
+                room.getRoomNo(),
+                room.getName(),
+                room.getGuestName(),
+                room.getType(),
+                room.getStatus(),
+                room.getPrice(),
+                room.getPaymentMethod(),
+                bookedStr
+            });
+        }
     }
 
     private void clearFields() {
@@ -653,13 +522,6 @@ public class HotelReservationSystem extends JFrame {
         spBookingAt.setValue(new Date());
         spBookingAt.setEnabled(false);
         currentSelected = null;
-    }
-
-    private Room findRoomByNo(int roomNo) {
-        for (Room r : rooms) {
-            if (r.getRoomNo() == roomNo) return r;
-        }
-        return null;
     }
 
     private String defaultPriceForType(String type) {
@@ -681,6 +543,17 @@ public class HotelReservationSystem extends JFrame {
         return new int[]{1, 30};
     }
 
+    private void updateRoomNoOptions() {
+        cbRoomNo.removeAllItems();
+        Object sel = cbCategory.getSelectedItem();
+        String type = sel == null ? "" : sel.toString();
+        int[] range = rangeForType(type);
+        for (int i = range[0]; i <= range[1]; i++) {
+            cbRoomNo.addItem(i);
+        }
+        cbRoomNo.setSelectedIndex(-1);
+    }
+
     private int indexForTypeRoomNo(String type, int roomNo) {
         int[] r = rangeForType(type);
         return roomNo - r[0] + 1;
@@ -696,19 +569,10 @@ public class HotelReservationSystem extends JFrame {
         room.setName(baseForType(room.getType()) + " " + idx);
     }
 
-    private void updateRoomNoOptions() {
-        cbRoomNo.removeAllItems();
-        Object sel = cbCategory.getSelectedItem();
-        String type = sel == null ? "" : sel.toString();
-        int[] range = rangeForType(type);
-        for (int i = range[0]; i <= range[1]; i++) cbRoomNo.addItem(i);
-        cbRoomNo.setSelectedIndex(-1);
-    }
-
-    private Font baseFont() {
-        Font f = getFont();
-        if (f == null) f = UIManager.getFont("Label.font");
-        if (f == null) f = new Font("Dialog", Font.PLAIN, 12);
-        return f;
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            HotelReservationSystem frame = new HotelReservationSystem();
+            frame.setVisible(true);
+        });
     }
 }

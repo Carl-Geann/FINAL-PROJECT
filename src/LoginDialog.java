@@ -3,7 +3,6 @@ import java.awt.*;
 import java.util.Map;
 
 public class LoginDialog extends JDialog {
-
     private JTextField emailField;
     private JPasswordField passwordField;
     private JButton btnToggle;
@@ -22,20 +21,11 @@ public class LoginDialog extends JDialog {
         setSize(screen.width, screen.height);
         setLocation(0, 0);
 
-        setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosing(java.awt.event.WindowEvent e) {
-                resultEmail = null;
-                dispose();
-            }
-        });
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         JPanel overlay = new JPanel(new GridBagLayout());
         overlay.setBackground(Color.WHITE);
         GridBagConstraints g = new GridBagConstraints();
-        g.gridx = 0; g.gridy = 0;
-        g.anchor = GridBagConstraints.CENTER;
 
         JPanel box = new JPanel(new BorderLayout());
         box.setBackground(Color.BLACK);
@@ -61,32 +51,23 @@ public class LoginDialog extends JDialog {
         passwordField = new JPasswordField(20);
 
         btnToggle = new JButton("Show");
-        btnToggle.setMargin(new Insets(2, 8, 2, 8));
         btnToggle.addActionListener(e -> togglePassword());
 
-        gc.gridx = 0; gc.gridy = 0;
-        form.add(lblEmail, gc);
-        gc.gridx = 1;
-        form.add(emailField, gc);
-
-        gc.gridx = 0; gc.gridy = 1;
-        form.add(lblPassword, gc);
-        gc.gridx = 1;
-        form.add(passwordField, gc);
-        gc.gridx = 2;
-        form.add(btnToggle, gc);
+        gc.gridx = 0; gc.gridy = 0; form.add(lblEmail, gc);
+        gc.gridx = 1; form.add(emailField, gc);
+        gc.gridx = 0; gc.gridy = 1; form.add(lblPassword, gc);
+        gc.gridx = 1; form.add(passwordField, gc);
+        gc.gridx = 2; form.add(btnToggle, gc);
 
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 12));
         actions.setBackground(Color.BLACK);
         JButton btnLogin = coloredButton("Login");
         JButton btnSignup = coloredButton("Signup");
-        JButton btnForgot = coloredButton("Forgot Password");
 
         btnLogin.addActionListener(e -> {
             String email = emailField.getText().trim().toLowerCase();
             String pass = new String(passwordField.getPassword()).trim();
-            String expected = users.get(email);
-            if (expected != null && expected.equals(pass)) {
+            if (users.get(email) != null && users.get(email).equals(pass)) {
                 resultEmail = email;
                 dispose();
             } else {
@@ -102,25 +83,18 @@ public class LoginDialog extends JDialog {
             }
         });
 
-        btnForgot.addActionListener(e -> JOptionPane.showMessageDialog(this, "Password reset not implemented"));
-
         actions.add(btnLogin);
         actions.add(btnSignup);
-        actions.add(btnForgot);
-
         box.add(form, BorderLayout.CENTER);
         box.add(actions, BorderLayout.SOUTH);
-
         overlay.add(box, g);
         setContentPane(overlay);
-        getRootPane().setDefaultButton(btnLogin);
     }
 
     private JButton coloredButton(String text) {
         JButton b = new JButton(text);
         b.setBackground(new Color(200, 0, 0));
         b.setForeground(Color.WHITE);
-        b.setFocusPainted(false);
         return b;
     }
 
