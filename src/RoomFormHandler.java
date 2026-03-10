@@ -178,9 +178,19 @@ public class RoomFormHandler {
 
         Room target = hotelManager.findRoomByNo(roomNoVal);
         if (target != null) {
+            int ok = JOptionPane.showConfirmDialog(
+                system,
+                "Update details for Room " + target.getRoomNo() + " (" + target.getName() + ")?",
+                "Confirm Update",
+                JOptionPane.OK_CANCEL_OPTION
+            );
+            if (ok != JOptionPane.OK_OPTION) return;
+            
             hotelManager.updateRoom(target, name, type, status, price, paymentMethod, guestName, bookedAt, bookOutAt, nights, discount, total, guestCount);
+            JOptionPane.showMessageDialog(system, "Room " + target.getRoomNo() + " has been successfully updated.", "Update Successful", JOptionPane.INFORMATION_MESSAGE);
         } else {
             hotelManager.addRoom(roomNoVal, name, type, status, price, paymentMethod, guestName, bookedAt, bookOutAt, nights, discount, total, guestCount);
+            JOptionPane.showMessageDialog(system, "New Room " + roomNoVal + " has been successfully added.", "Room Added", JOptionPane.INFORMATION_MESSAGE);
         }
 
         system.roomUpdateTable();
