@@ -3,8 +3,8 @@ import java.util.Date;
 import java.text.ParseException;
 
 /**
- * This class RoomFormHandler is for managing the Room Details form logic.
- * It handles field validation, calculations, and interactions between the form UI and the HotelManager.
+ * Kini nga class nga RoomFormHandler kay para sa pagdumala sa logic sa Room Details form.
+ * Kini ang nag-handle sa field validation, pagkalkula, ug pakig-uban tali sa form UI ug sa HotelManager.
  */
 public class RoomFormHandler {
     // References to UI components in the form
@@ -40,7 +40,7 @@ public class RoomFormHandler {
         this.spBookOutAt = spBookOutAt;
     }
 
-    // This method resets all form fields to their default empty states
+    // Kini nga method nag-reset sa tanang field sa form ngadto sa ilang default nga walay sulod.
     public void clearFields() {
         cbRoomNo.setSelectedIndex(-1);
         txtName.setText("");
@@ -64,7 +64,7 @@ public class RoomFormHandler {
         system.updateActionButtons();
     }
 
-    // This method populates the form with data from a selected Room object
+    // Kini nga method nagpuno sa form og data gikan sa napili nga Room object.
     public void selectRoomInForm(Room r) {
         currentSelected = r;
         cbCategory.setSelectedItem(r.getType());
@@ -89,7 +89,7 @@ public class RoomFormHandler {
         system.updateActionButtons();
     }
 
-    // This method calculates the total payment based on price, nights, and discounts
+    // Kini nga method nagkalkula sa total nga bayad base sa presyo, gidaghanon sa gabii, ug mga discount.
     public void calculateTotal() {
         try {
             double price = Double.parseDouble(txtPrice.getText().isEmpty() ? "0" : txtPrice.getText());
@@ -103,7 +103,7 @@ public class RoomFormHandler {
         }
     }
 
-    // This method updates the guest count dropdown based on the room category's capacity
+    // Kini nga method naga-update sa guest count dropdown base sa kapasidad sa kategorya sa kwarto.
     public void updateGuestCountOptions() {
         if (cbGuestCount == null || cbCategory == null) return;
         int maxGuests = 2;
@@ -126,7 +126,7 @@ public class RoomFormHandler {
         }
     }
 
-    // This method updates the room number dropdown based on the selected category
+    // Kini nga method naga-update sa room number dropdown base sa napili nga kategorya.
     public void updateRoomNoOptions() {
         if (cbRoomNo == null || cbCategory == null) return;
         cbRoomNo.removeAllItems();
@@ -139,7 +139,7 @@ public class RoomFormHandler {
         cbRoomNo.setSelectedIndex(-1);
     }
 
-    // This method saves or updates a room's data from the form to the inventory
+    // Kini nga method nag-save o nag-update sa data sa kwarto gikan sa form ngadto sa inventory.
     public void saveRoom() {
         String name = txtName.getText();
         String type = cbCategory.getSelectedItem().toString();
@@ -187,7 +187,7 @@ public class RoomFormHandler {
         clearFields();
     }
 
-    // This method processes a "Book In" request for a selected room
+    // Kini nga method nag-proseso sa "Book In" nga request para sa napili nga kwarto.
     public void bookInRoom() {
         if (currentSelected == null) {
             JOptionPane.showMessageDialog(system, "Please select a room from the table first.", "No Room Selected", JOptionPane.WARNING_MESSAGE);
@@ -246,7 +246,7 @@ public class RoomFormHandler {
         JOptionPane.showMessageDialog(system, "Room " + currentSelected.getRoomNo() + " has been successfully booked.", "Book In Successful", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // This method automatically updates the predicted check-out date based on nights stay
+    // Kini nga method awtomatiko nga naga-update sa gitagna nga check-out date base sa gidaghanon sa gabii nga pagpuyo.
     public void updateBookOutDate() {
         Date bookingAt = (Date) spBookingAt.getValue();
         Integer nights = (Integer) cbNights.getSelectedItem();

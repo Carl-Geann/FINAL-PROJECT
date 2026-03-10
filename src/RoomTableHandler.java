@@ -3,15 +3,15 @@ import javax.swing.table.DefaultTableModel;
 import java.text.SimpleDateFormat;
 
 /**
- * This class RoomTableHandler is for managing the JTable UI displays.
- * It handles updating the main room table and the guest list table with data from HotelManager.
+ * Kini nga class nga RoomTableHandler kay para sa pagdumala sa JTable UI display.
+ * Kini ang nag-handle sa pag-update sa main room table ug sa guest list table gamit ang data gikan sa HotelManager.
  */
 public class RoomTableHandler {
-    // Model references for the main room table and guest list table
+    // Mga model reference para sa main room table ug guest list table.
     private DefaultTableModel model, guestModel;
-    // UI Label to display the total number of guests currently in the hotel
+    // UI Label para ipakita ang kinatibuk-ang gidaghanon sa mga bisita nga anaa karon sa hotel.
     private JLabel lblTotalGuests;
-    // Filter components for the main room table
+    // Mga filter component para sa main room table.
     private JComboBox<String> cbFilterType, cbFilterStatus, cbFilterPayment;
     
     private HotelManager hotelManager;
@@ -31,7 +31,7 @@ public class RoomTableHandler {
         this.cbFilterPayment = cbFilterPayment;
     }
 
-    // This method refreshes the Guest List table with currently booked rooms
+    // Kini nga method naga-refresh sa Guest List table uban ang mga kwarto nga gi-book karon.
     public void updateGuestListTable() {
         guestModel.setRowCount(0);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -46,7 +46,7 @@ public class RoomTableHandler {
         }
     }
 
-    // This method applies filters to the main room table and updates the guest count
+    // Kini nga method nag-apply og mga filter sa main room table ug naga-update sa gidaghanon sa mga bisita.
     public void filterRooms() {
         String typeFilter = cbFilterType.getSelectedItem().toString();
         String statusFilter = cbFilterStatus.getSelectedItem().toString();
@@ -76,7 +76,7 @@ public class RoomTableHandler {
         lblTotalGuests.setText(" | Total Guests In: " + totalGuestsIn);
     }
 
-    // This method updates the main room table with the full inventory list
+    // Kini nga method naga-update sa main room table uban ang kompleto nga listahan sa inventory.
     public void roomUpdateTable() {
         model.setRowCount(0);
         int totalGuestsIn = 0;

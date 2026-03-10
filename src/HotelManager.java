@@ -4,54 +4,54 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * This class HotelManager is for managing the collection of rooms and business logic.
- * It handles adding, updating, booking, and filtering rooms in the hotel.
+ * Kini nga class nga HotelManager kay para sa pagdumala sa koleksyon sa mga kwarto ug business logic.
+ * Kini ang nag-handle sa pagdugang, pag-update, pag-book, ug pag-filter sa mga kwarto sa hotel.
  */
 public class HotelManager {
-    // This list stores all the rooms currently in the hotel inventory
+    // Kini nga listahan nagtipig sa tanang mga kwarto nga anaa karon sa inventory sa hotel.
     private ArrayList<Room> rooms;
 
     public HotelManager() {
         this.rooms = new ArrayList<>();
-        // Seeds the initial set of rooms when the manager is created
+        // Nagbutang sa inisyal nga set sa mga kwarto sa dihang gihimo ang manager.
         seedInventory();
     }
 
-    // This method returns the complete list of rooms
+    // Kini nga method nag-return sa kompleto nga listahan sa mga kwarto.
     public List<Room> getAllRooms() {
         return rooms;
     }
 
-    // This method returns only the rooms that are currently booked by guests
+    // Kini nga method nag-return lamang sa mga kwarto nga gi-book karon sa mga bisita.
     public List<Room> getBookedRooms() {
         return rooms.stream()
                 .filter(r -> "Booked".equals(r.getStatus()) && r.getGuestName() != null && !r.getGuestName().trim().isEmpty())
                 .collect(Collectors.toList());
     }
 
-    // This method finds a specific room using its unique room number
+    // Kini nga method nangita og piho nga kwarto gamit ang iyang talagsaon nga numero sa kwarto.
     public Room findRoomByNo(int roomNo) {
         return rooms.stream().filter(r -> r.getRoomNo() == roomNo).findFirst().orElse(null);
     }
 
-    // This method finds a room by its descriptive name
+    // Kini nga method nangita og kwarto pinaagi sa iyang deskriptibong ngalan.
     public Room findRoomByName(String name) {
         return rooms.stream().filter(r -> r.getName().equals(name)).findFirst().orElse(null);
     }
 
-    // This method generates the next available room number
+    // Kini nga method nag-generate sa sunod nga anaa nga numero sa kwarto.
     private int nextRoomNo() {
         return rooms.stream().mapToInt(Room::getRoomNo).max().orElse(0) + 1;
     }
 
-    // This method populates the initial inventory of rooms for different categories
+    // Kini nga method nagpuno sa inisyal nga inventory sa mga kwarto para sa lain-laing mga kategorya.
     private void seedInventory() {
         seedType("VIP", "VIP", 10, "100");
         seedType("Family", "Family", 10, "80");
         seedType("Double Bed", "Double", 10, "60");
     }
 
-    // This method helper creates multiple rooms of a specific type
+    // Kini nga method helper naghimo og daghang mga kwarto sa usa ka piho nga klase.
     private void seedType(String type, String base, int count, String price) {
         for (int i = 1; i <= count; i++) {
             String name = base + " " + i;
@@ -61,7 +61,7 @@ public class HotelManager {
         }
     }
 
-    // This method updates the details of an existing room
+    // Kini nga method naga-update sa mga detalye sa usa ka anaa na nga kwarto.
     public void updateRoom(Room target, String name, String type, String status, String price, 
                            String paymentMethod, String guestName, Date bookedAt, Date bookOutAt, 
                            int nights, double discount, double total, int guestCount) {
@@ -81,7 +81,7 @@ public class HotelManager {
         }
     }
 
-    // This method adds a new room to the system with full details
+    // Kini nga method nagdugang og bag-ong kwarto sa sistema nga adunay kompleto nga mga detalye.
     public void addRoom(int roomNo, String name, String type, String status, String price, 
                         String paymentMethod, String guestName, Date bookedAt, Date bookOutAt, 
                         int nights, double discount, double total, int guestCount) {
@@ -95,7 +95,7 @@ public class HotelManager {
         rooms.add(room);
     }
 
-    // This method processes a "Book In" action for a guest
+    // Kini nga method nag-proseso sa aksyon nga "Book In" para sa usa ka bisita.
     public void bookInRoom(Room room, String guestName, String paymentMethod, int nights, 
                            int guestCount, double discount, Date bookedAt, double total) {
         room.setStatus("Booked");
