@@ -84,7 +84,7 @@ public class HotelReservationSystem extends JFrame {
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(themeRed);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 0, 8, 15);
+        gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
@@ -377,6 +377,7 @@ public class HotelReservationSystem extends JFrame {
         mainSplit.setDividerLocation(450);
         mainSplit.setDividerSize(5);
         mainSplit.setContinuousLayout(true);
+        mainSplit.setBorder(null);
         add(mainSplit, BorderLayout.CENTER);
 
         // Kini nga code nagdugang og mga navigation action listener.
@@ -561,24 +562,34 @@ public class HotelReservationSystem extends JFrame {
         table.clearSelection();
     }
 
-    // Kini nga method nag-handle sa proseso sa pag-sign out (wala gigamit sa kini nga bersyon).
+    // Kini nga method nag-handle sa proseso sa pag-sign out.
+    // Kini mopatuman sa pag-reset sa user status ug mobalik sa login flow.
     private void signOut() {
-        authManager.setSignedIn(true);
-        authManager.setCurrentUser("geann@gmail.com");
-        updateAuthUI();
+        // I-set ang sign-in status ngadto sa false
+        authManager.setSignedIn(false);
+        authManager.setCurrentUser(null);
+        
+        // I-hide ang main window ug limpyohan ang mga field
+        setVisible(false);
         formHandler.clearFields();
+        
+        // Pag-restart sa login process gamit ang LoginDialog
+        String email = LoginDialog.show(this, authManager.getUsers());
+        
+        if (email != null) {
+            // Kung malampuson ang bag-ong login
+            authManager.setSignedIn(true);
+            authManager.setCurrentUser(email);
+            updateAuthUI();
+            setVisible(true);
+        } else {
+            // Kung gi-close ang login dialog nga wala naka-login
+            System.exit(0);
+        }
     }
 
-    // Kini nga code nga main method mao ang entry point nga nag-launch sa application.
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            HotelReservationSystem system = new HotelReservationSystem();
-            // Awtomatiko nga naga-sign in gamit ang default user para sa testing.
-            system.setSignedIn(true);
-            system.setCurrentUser("geann@gmail.com");
-            system.updateAuthUI();
-            system.setVisible(true);
-        });
-    }
+    // Kini nga code nga main method mao ang entry point kung daganon ang file.
+    
+    
 
 }

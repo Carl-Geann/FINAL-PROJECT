@@ -1,24 +1,32 @@
-
-
-import javax.swing.*;
-import java.util.LinkedHashMap;
+import javax.swing.SwingUtilities;
 import java.util.Map;
 
+/**
+ * Kini nga class nga Main mao ang entry point sa Hotel Reservation System.
+ * Kini nagdumala sa pagpakita sa login dialog sa dili pa ablihan ang main system.
+ */
 public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            Map<String, String> creds = new LinkedHashMap<>();
-            creds.put("geann@gmail.com", "geann123");
-            creds.put("staff@example.com", "staff123");
-            String email = LoginDialog.show(null, creds);
-            if (email == null) System.exit(0);
-            HotelReservationSystem app = new HotelReservationSystem();
-            app.setUsers(creds);
-            app.setSignedIn(true);
-            app.setCurrentUser(email);
-            app.updateAuthUI();
-            app.setVisible(true);
-            app.setExtendedState(app.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+            // Pag-initialize sa main system frame
+            HotelReservationSystem system = new HotelReservationSystem();
+            
+            // Pagkuha sa listahan sa mga rehistradong user gikan sa AuthManager
+            Map<String, String> users = system.getUsersMap();
+            
+            // Pagpakita sa Login Dialog ug pagkuha sa email kung naka-login
+            String email = LoginDialog.show(system, users);
+            
+            if (email != null) {
+                // Kung malampuson ang login, i-set ang user status
+                system.setSignedIn(true);
+                system.setCurrentUser(email);
+                system.updateAuthUI();
+                system.setVisible(true);
+            } else {
+                // Kung wala naka-login (gi-close ang dialog), i-exit ang programa
+                System.exit(0);
+            }
         });
     }
 }
