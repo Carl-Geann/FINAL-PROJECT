@@ -1,6 +1,8 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Calendar;
 
 /**
  * Kini nga class nga RoomTableHandler kay para sa pagdumala sa JTable UI display.
@@ -36,11 +38,23 @@ public class RoomTableHandler {
         guestModel.setRowCount(0);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         for (Room room : hotelManager.getBookedRooms()) {
+            Date bookOutDate = room.getBookOutAt();
+            
+            // Backup calculation if for some reason bookOutAt is still null
+            if (bookOutDate == null && room.getBookedAt() != null) {
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(room.getBookedAt());
+                cal.add(Calendar.DATE, room.getNights());
+                bookOutDate = cal.getTime();
+                room.setBookOutAt(bookOutDate); // Save it back to the room object
+            }
+
             Object[] row = {
+                room.getRoomNo(),
                 room.getGuestName(),
                 room.getName(),
                 room.getBookedAt() != null ? sdf.format(room.getBookedAt()) : "",
-                room.getBookOutAt() != null ? sdf.format(room.getBookOutAt()) : ""
+                bookOutDate != null ? sdf.format(bookOutDate) : ""
             };
             guestModel.addRow(row);
         }

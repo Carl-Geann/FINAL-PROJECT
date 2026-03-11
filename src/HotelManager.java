@@ -105,7 +105,17 @@ public class HotelManager {
         room.setGuestCount(guestCount);
         room.setDiscount(discount);
         room.setBookedAt(bookedAt);
-        room.setBookOutAt(null);
+        
+        // Awtomatiko nga kalkulasyon sa book out date base sa bookedAt ug nights.
+        if (bookedAt != null) {
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            cal.setTime(bookedAt);
+            cal.add(java.util.Calendar.DATE, nights);
+            room.setBookOutAt(cal.getTime());
+        } else {
+            room.setBookOutAt(null);
+        }
+        
         room.setTotal(total);
     }
 

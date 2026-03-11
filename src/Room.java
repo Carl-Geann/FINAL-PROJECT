@@ -1,10 +1,13 @@
+
 import java.util.Date;
 
 /**
- * Kini nga class nga Room kay usa ka data model nga nagrepresentar sa usa ka kwarto sa hotel.
- * Kini nagtipig sa tanang impormasyon nga may kalabutan sa status sa kwarto, mga detalye sa bisita, ug presyo.
+ * Kini nga class nga Room kay usa ka data model nga nagrepresentar sa usa ka
+ * kwarto sa hotel. Kini nagtipig sa tanang impormasyon nga may kalabutan sa
+ * status sa kwarto, mga detalye sa bisita, ug presyo.
  */
 public class Room {
+
     // Talagsaon nga identifier para sa kwarto.
     private int roomNo;
     // Deskriptibong ngalan sa kwarto.
@@ -45,35 +48,108 @@ public class Room {
         this.nights = 1;
         this.discount = 0.0;
         this.total = 0.0;
-        this.guestCount = 1; 
+        this.guestCount = 1;
     }
 
     // Kini nga seksyon adunay mga Getter para makuha ang impormasyon sa kwarto.
-    public int getRoomNo() { return roomNo; }
-    public String getName() { return name; }
-    public String getType() { return type; }
-    public String getStatus() { return status; }
-    public String getPrice() { return price; }
-    public String getPaymentMethod() { return paymentMethod; }
-    public Date getBookedAt() { return bookedAt; }
-    public Date getBookOutAt() { return bookOutAt; }
-    public String getGuestName() { return guestName; }
-    public int getNights() { return nights; }
-    public double getDiscount() { return discount; }
-    public double getTotal() { return total; }
-    public int getGuestCount() { return guestCount; }
+    public int getRoomNo() {
+        return roomNo;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public Date getBookedAt() {
+        return bookedAt;
+    }
+
+    public Date getBookOutAt() {
+        return bookOutAt;
+    }
+
+    public String getGuestName() {
+        return guestName;
+    }
+
+    public int getNights() {
+        return nights;
+    }
+
+    public double getDiscount() {
+        return discount;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+    public int getGuestCount() {
+        return guestCount;
+    }
 
     // Kini nga seksyon adunay mga Setter para ma-update ang impormasyon sa kwarto.
-    public void setName(String name) { this.name = name; }
-    public void setType(String type) { this.type = type; }
-    public void setStatus(String status) { this.status = status; }
-    public void setPrice(String price) { this.price = price; }
-    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
-    public void setBookedAt(Date bookedAt) { this.bookedAt = bookedAt; }
-    public void setBookOutAt(Date bookOutAt) { this.bookOutAt = bookOutAt; }
-    public void setGuestName(String guestName) { this.guestName = guestName; }
-    public void setNights(int nights) { this.nights = nights; }
-    public void setDiscount(double discount) { this.discount = discount; }
-    public void setTotal(double total) { this.total = total; }
-    public void setGuestCount(int guestCount) { this.guestCount = guestCount; }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public void setBookedAt(Date bookedAt) {
+        this.bookedAt = bookedAt;
+    }
+
+    public void setBookOutAt(Date bookOutAt) {
+        this.bookOutAt = bookOutAt;
+    }
+
+    public void setGuestName(String guestName) {
+        this.guestName = guestName;
+    }
+
+    public void setNights(int nights) {
+        this.nights = nights;
+    }
+
+    public void setDiscount(double discount) {
+        this.discount = discount;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
+    }
+
+    public void setGuestCount(int guestCount) {
+        this.guestCount = guestCount;
+    }
 }

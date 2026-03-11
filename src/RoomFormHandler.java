@@ -1,27 +1,30 @@
+
 import javax.swing.*;
 import java.util.Date;
 import java.text.ParseException;
 
 /**
- * Kini nga class nga RoomFormHandler kay para sa pagdumala sa logic sa Room Details form.
- * Kini ang nag-handle sa field validation, pagkalkula, ug pakig-uban tali sa form UI ug sa HotelManager.
+ * Kini nga class nga RoomFormHandler kay para sa pagdumala sa logic sa Room
+ * Details form. Kini ang nag-handle sa field validation, pagkalkula, ug
+ * pakig-uban tali sa form UI ug sa HotelManager.
  */
 public class RoomFormHandler {
+
     // References to UI components in the form
     private JComboBox<Integer> cbRoomNo, cbNights, cbGuestCount;
     private JTextField txtName, txtPrice, txtGuest, txtDiscount, txtTotalPayment;
     private JComboBox<String> cbCategory, cbStatus, cbPaymentMethod;
     private JSpinner spBookingAt, spBookOutAt;
-    
+
     private HotelManager hotelManager;
     private Room currentSelected;
     private HotelReservationSystem system;
 
     public RoomFormHandler(HotelReservationSystem system, HotelManager hotelManager,
-                           JComboBox<Integer> cbRoomNo, JComboBox<Integer> cbNights, JComboBox<Integer> cbGuestCount,
-                           JTextField txtName, JTextField txtPrice, JTextField txtGuest, JTextField txtDiscount,
-                           JTextField txtTotalPayment, JComboBox<String> cbCategory, JComboBox<String> cbStatus,
-                           JComboBox<String> cbPaymentMethod, JSpinner spBookingAt, JSpinner spBookOutAt) {
+            JComboBox<Integer> cbRoomNo, JComboBox<Integer> cbNights, JComboBox<Integer> cbGuestCount,
+            JTextField txtName, JTextField txtPrice, JTextField txtGuest, JTextField txtDiscount,
+            JTextField txtTotalPayment, JComboBox<String> cbCategory, JComboBox<String> cbStatus,
+            JComboBox<String> cbPaymentMethod, JSpinner spBookingAt, JSpinner spBookOutAt) {
         // Initializing references
         this.system = system;
         this.hotelManager = hotelManager;
@@ -105,7 +108,9 @@ public class RoomFormHandler {
 
     // Kini nga method naga-update sa guest count dropdown base sa kapasidad sa kategorya sa kwarto.
     public void updateGuestCountOptions() {
-        if (cbGuestCount == null || cbCategory == null) return;
+        if (cbGuestCount == null || cbCategory == null) {
+            return;
+        }
         int maxGuests = 2;
         String category = cbCategory.getSelectedItem().toString();
         if ("VIP".equals(category)) {
@@ -113,7 +118,7 @@ public class RoomFormHandler {
         } else if ("Family".equals(category)) {
             maxGuests = 7;
         }
-        
+
         Integer currentVal = (Integer) cbGuestCount.getSelectedItem();
         cbGuestCount.removeAllItems();
         for (int i = 1; i <= maxGuests; i++) {
@@ -128,7 +133,9 @@ public class RoomFormHandler {
 
     // Kini nga method naga-update sa room number dropdown base sa napili nga kategorya.
     public void updateRoomNoOptions() {
-        if (cbRoomNo == null || cbCategory == null) return;
+        if (cbRoomNo == null || cbCategory == null) {
+            return;
+        }
         cbRoomNo.removeAllItems();
         Object sel = cbCategory.getSelectedItem();
         String type = sel == null ? "" : sel.toString();
@@ -152,8 +159,9 @@ public class RoomFormHandler {
         int guestCount = (Integer) cbGuestCount.getSelectedItem();
         try {
             discount = Double.parseDouble(txtDiscount.getText());
-        } catch (NumberFormatException ignored) {}
-        
+        } catch (NumberFormatException ignored) {
+        }
+
         double priceVal = Double.parseDouble(price.isEmpty() ? "0" : price);
         double total = (priceVal * nights) + (priceVal * guestCount) - discount;
 
@@ -171,7 +179,8 @@ public class RoomFormHandler {
         try {
             spBookingAt.commitEdit();
             spBookOutAt.commitEdit();
-        } catch (ParseException ignored) {}
+        } catch (ParseException ignored) {
+        }
 
         Date bookedAt = "Booked".equals(status) ? (Date) spBookingAt.getValue() : null;
         Date bookOutAt = "Booked".equals(status) ? (Date) spBookOutAt.getValue() : null;
@@ -179,13 +188,15 @@ public class RoomFormHandler {
         Room target = hotelManager.findRoomByNo(roomNoVal);
         if (target != null) {
             int ok = JOptionPane.showConfirmDialog(
-                system,
-                "Update details for Room " + target.getRoomNo() + " (" + target.getName() + ")?",
-                "Confirm Update",
-                JOptionPane.OK_CANCEL_OPTION
+                    system,
+                    "Update details for Room " + target.getRoomNo() + " (" + target.getName() + ")?",
+                    "Confirm Update",
+                    JOptionPane.OK_CANCEL_OPTION
             );
-            if (ok != JOptionPane.OK_OPTION) return;
-            
+            if (ok != JOptionPane.OK_OPTION) {
+                return;
+            }
+
             hotelManager.updateRoom(target, name, type, status, price, paymentMethod, guestName, bookedAt, bookOutAt, nights, discount, total, guestCount);
             JOptionPane.showMessageDialog(system, "Room " + target.getRoomNo() + " has been successfully updated.", "Update Successful", JOptionPane.INFORMATION_MESSAGE);
         } else {
@@ -221,7 +232,9 @@ public class RoomFormHandler {
                 "Confirm Book In",
                 JOptionPane.OK_CANCEL_OPTION
         );
-        if (ok != JOptionPane.OK_OPTION) return;
+        if (ok != JOptionPane.OK_OPTION) {
+            return;
+        }
 
         String paymentMethod = cbPaymentMethod.getSelectedItem().toString();
         int nights = (Integer) cbNights.getSelectedItem();
@@ -294,7 +307,9 @@ public class RoomFormHandler {
                 "Confirm Book Out",
                 JOptionPane.OK_CANCEL_OPTION
         );
-        if (ok != JOptionPane.OK_OPTION) return;
+        if (ok != JOptionPane.OK_OPTION) {
+            return;
+        }
 
         hotelManager.bookOutRoom(roomToBookOut);
         system.roomUpdateTable();
