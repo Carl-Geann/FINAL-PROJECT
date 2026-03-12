@@ -15,8 +15,8 @@ public class AuthManager {
 
     public AuthManager() {
         // Nag-initialize sa mga default nga account sa user.
-        users.put("geann@gmail.com", "geann123");
-        users.put("staff@example.com", "staff123");
+        users.put("", "");
+        users.put("staff@hotel.com", "staff123");
     }
 
     // Kini nga method kay nag-check kung naay naka-sign in.

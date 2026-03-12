@@ -463,10 +463,10 @@ public class HotelReservationSystem extends JFrame {
         JPanel footer = new JPanel(new BorderLayout());
         footer.setBackground(themeRed);
         footer.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
-        lblUser = new JLabel("Signed out");
+        lblUser = new JLabel("");
         lblUser.setFont(labelFont);
         lblUser.setForeground(themeYellow);
-        btnSignOut = new JButton("Sign Out");
+        btnSignOut = new JButton("");
         btnSignOut.setFont(tradeGothicBold);
         btnSignOut.setBackground(themeYellow);
         btnSignOut.setForeground(themeRed);
@@ -562,34 +562,24 @@ public class HotelReservationSystem extends JFrame {
         table.clearSelection();
     }
 
-    // Kini nga method nag-handle sa proseso sa pag-sign out.
-    // Kini mopatuman sa pag-reset sa user status ug mobalik sa login flow.
+    // Kini nga method nag-handle sa proseso sa pag-sign out (wala gigamit sa kini nga bersyon).
     private void signOut() {
-        // I-set ang sign-in status ngadto sa false
-        authManager.setSignedIn(false);
-        authManager.setCurrentUser(null);
-        
-        // I-hide ang main window ug limpyohan ang mga field
-        setVisible(false);
+        authManager.setSignedIn(true);
+        authManager.setCurrentUser("geann@gmail.com");
+        updateAuthUI();
         formHandler.clearFields();
-        
-        // Pag-restart sa login process gamit ang LoginDialog
-        String email = LoginDialog.show(this, authManager.getUsers());
-        
-        if (email != null) {
-            // Kung malampuson ang bag-ong login
-            authManager.setSignedIn(true);
-            authManager.setCurrentUser(email);
-            updateAuthUI();
-            setVisible(true);
-        } else {
-            // Kung gi-close ang login dialog nga wala naka-login
-            System.exit(0);
-        }
     }
 
-    // Kini nga code nga main method mao ang entry point kung daganon ang file.
-    
-    
+    // Kini nga code nga main method mao ang entry point nga nag-launch sa application.
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            HotelReservationSystem system = new HotelReservationSystem();
+            // Awtomatiko nga naga-sign in gamit ang default user para sa testing.
+            system.setSignedIn(true);
+            system.setCurrentUser("staff@hotel.com");
+            system.updateAuthUI();
+            system.setVisible(true);
+        });
+    }
 
 }
