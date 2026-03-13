@@ -21,9 +21,9 @@ public class HotelReservationSystem extends JFrame {
     private DefaultTableModel model;
     private JTextField txtSearch;
 
-    // Core logic managers
-    private HotelManager hotelManager;
-    private AuthManager authManager;
+    // Core logic managers - Changed to public for Main access
+    public HotelManager hotelManager;
+    public AuthManager authManager;
 
     // Specialized UI logic handlers
     private RoomFormHandler formHandler;
@@ -50,13 +50,16 @@ public class HotelReservationSystem extends JFrame {
     public HotelReservationSystem() {
         // Kini nga code nag-initialize sa mga properties sa main JFrame window.
         setTitle("UM DEL HOTEL - Reservation List");
-        setSize(1200, 700);
-        setLocationRelativeTo(null);
+        
+        // Set to full screen
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setUndecorated(false); // Keep title bar for main dashboard to allow window controls
+        
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
         // Set Window Icon
-        ImageIcon windowIcon = getScaledIcon("background log in.jpg", 64, 64);
+        ImageIcon windowIcon = getScaledIcon("logo.png", 64, 64);
         if (windowIcon != null) {
             setIconImage(windowIcon.getImage());
         }
@@ -138,7 +141,7 @@ public class HotelReservationSystem extends JFrame {
 
         // Kini nga code nagdugang og label ug nagdugang og mga field sa form panel.
         String[] labels = {"Room No", "Room", "Category", "Guest Name", "Status", "Guests In", "Price", "Payment Method", "Discount", "Nights", "Total Payment", "Booking Date/Time", "Book Out"};
-        String[] iconPaths = {"room no.png", "room.png", "category.png", "guest list.png", "status.png", "occupied.png", "price.webp", "payment method.png", "discount.png", "nights.png", "total payment.png", "book_in.png", "book out.png"};
+        String[] iconPaths = {"room no.png", "room.png", "category.png", "guest list.png", "status.png", "occupied.png", "total payment.png", "payment method.png", "discount.png", "book_in.png", "total payment.png", "book_in.png", "book out.png"};
         JComponent[] fields = {cbRoomNo, txtName, cbCategory, txtGuest, cbStatus, cbGuestCount, txtPrice, cbPaymentMethod, txtDiscount, cbNights, txtTotalPayment, spBookingAt, spBookOutAt};
 
         for (JComponent field : fields) {
@@ -356,7 +359,7 @@ public class HotelReservationSystem extends JFrame {
 
         // Kini nga code nag-combine sa mga panel gamit ang split pane.
         mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
-        mainSplit.setDividerLocation(450);
+        mainSplit.setDividerLocation(500); // Increased from 450 for better full-screen balance
         mainSplit.setDividerSize(5);
         mainSplit.setContinuousLayout(true);
         mainSplit.setBorder(null);
@@ -625,26 +628,6 @@ public class HotelReservationSystem extends JFrame {
         }
         
         return btn;
-    }
-
-    // Kini nga code nga main method mao ang entry point nga nag-launch sa application.
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            HotelReservationSystem system = new HotelReservationSystem();
-            
-            // Pagpakita sa login dialog sa dili pa ablihan ang main system.
-            LoginDialog login = new LoginDialog(system, system.authManager);
-            login.setVisible(true);
-            
-            if (login.isAuthenticated()) {
-                system.setSignedIn(true);
-                system.setCurrentUser(login.getLoggedInUser());
-                system.updateAuthUI();
-                system.setVisible(true);
-            } else {
-                System.exit(0);
-            }
-        });
     }
 
 }

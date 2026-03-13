@@ -20,16 +20,18 @@ public class LoginDialog extends JDialog {
         super(parent, "Hotel Login", true);
         this.authManager = authManager;
         
-        // Kini nga code nag-initialize sa layout ug size sa login dialog.
-        // Set to full screen size as requested
+        // Make the dialog undecorated for a true full-screen immersive experience
+        setUndecorated(true);
+        
+        // Set to full screen size (usable area including taskbar or true full screen)
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setSize(screenSize.width, screenSize.height);
-        setLocationRelativeTo(null);
-        setResizable(true); // Allow resizing if maximized
+        setLocation(0, 0);
+        setResizable(false); 
         setLayout(new BorderLayout());
 
         // Set Window Icon
-        ImageIcon windowIcon = getScaledIcon("background log in.jpg", 64, 64);
+        ImageIcon windowIcon = getScaledIcon("logo.png", 64, 64);
         if (windowIcon != null) {
             setIconImage(windowIcon.getImage());
         }
@@ -53,10 +55,18 @@ public class LoginDialog extends JDialog {
         if (fontButton.getFamily().equals("Dialog")) fontButton = new Font("Arial", Font.BOLD, 18);
 
         // Header Panel
-        JPanel headerPanel = new JPanel();
+        JPanel headerPanel = new JPanel(new GridBagLayout());
         headerPanel.setBackground(themeRed);
-        headerPanel.setPreferredSize(new Dimension(0, 150));
-        headerPanel.setLayout(new GridBagLayout());
+        headerPanel.setPreferredSize(new Dimension(0, 140)); // Even sleeker header
+
+        // Add Logo to Header
+        ImageIcon logoIcon = getScaledIcon("logo.png", 130, 130); 
+        if (logoIcon != null) {
+            JLabel lblLogo = new JLabel(logoIcon);
+            lblLogo.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 30));
+            headerPanel.add(lblLogo);
+        }
+
         JLabel lblHeader = new JLabel("UM DEL HOTEL");
         lblHeader.setFont(fontHeader);
         lblHeader.setForeground(textColor);
@@ -67,28 +77,31 @@ public class LoginDialog extends JDialog {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                ImageIcon bgIcon = getScaledIcon("background log in.jpg", getWidth(), getHeight());
-                if (bgIcon != null) {
-                    g.drawImage(bgIcon.getImage(), 0, 0, null);
+                java.net.URL imgURL = getClass().getResource("/pic/background login.jpg");
+                if (imgURL != null) {
+                    ImageIcon icon = new ImageIcon(imgURL);
+                    Image img = icon.getImage();
+                    // Draw full screen stretch fill
+                    g.drawImage(img, 0, 0, getWidth(), getHeight(), null);
                 }
             }
         };
         centerWrapper.setBackground(themeRed);
 
-        // Login Box (The "normal box" adjusted)
-        JPanel loginBox = new JPanel(new BorderLayout(0, 10));
+        // Login Box - Adjusted to be even smaller as requested
+        JPanel loginBox = new JPanel(new BorderLayout(0, 10)); 
         loginBox.setBackground(lightYellow);
-        loginBox.setPreferredSize(new Dimension(600, 350)); // Adjusted dimensions
+        loginBox.setPreferredSize(new Dimension(500, 280)); // Even more compact
         loginBox.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(Color.YELLOW, 4),
-            BorderFactory.createEmptyBorder(30, 40, 30, 40)
+            BorderFactory.createLineBorder(Color.YELLOW, 3), 
+            BorderFactory.createEmptyBorder(15, 35, 15, 35) // Tighter padding
         ));
 
         // Form Panel inside Login Box
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.insets = new Insets(5, 5, 5, 5); 
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // Username
@@ -98,7 +111,7 @@ public class LoginDialog extends JDialog {
         lblUser.setFont(fontLabel);
         lblUser.setForeground(themeRed);
         
-        ImageIcon userIcon = getScaledIcon("guest list.png", 24, 24);
+        ImageIcon userIcon = getScaledIcon("guest list.png", 24, 24); 
         if (userIcon != null) {
             lblUser.setIcon(userIcon);
             lblUser.setIconTextGap(10);
@@ -109,11 +122,11 @@ public class LoginDialog extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 0.7;
         txtUsername = new JTextField(15);
-        txtUsername.setFont(fontButton); // Use bold font for text
+        txtUsername.setFont(fontButton); 
         txtUsername.setForeground(themeRed);
         txtUsername.setBackground(Color.WHITE);
-        txtUsername.setBorder(BorderFactory.createLineBorder(themeRed, 1));
-        txtUsername.setPreferredSize(new Dimension(300, 40));
+        txtUsername.setBorder(BorderFactory.createLineBorder(themeRed, 1)); 
+        txtUsername.setPreferredSize(new Dimension(280, 32)); // Narrower and smaller height
         formPanel.add(txtUsername, gbc);
 
         // Password
@@ -134,15 +147,15 @@ public class LoginDialog extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 0.7;
         txtPassword = new JPasswordField(15);
-        txtPassword.setFont(fontButton); // Use bold font for text
+        txtPassword.setFont(fontButton);
         txtPassword.setForeground(themeRed);
         txtPassword.setBackground(Color.WHITE);
         txtPassword.setBorder(BorderFactory.createLineBorder(themeRed, 1));
-        txtPassword.setPreferredSize(new Dimension(300, 40));
+        txtPassword.setPreferredSize(new Dimension(280, 32)); 
         formPanel.add(txtPassword, gbc);
 
         // Buttons Panel inside Login Box
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0)); 
         buttonPanel.setOpaque(false);
 
         btnLogin = new JButton("Login");
@@ -150,14 +163,14 @@ public class LoginDialog extends JDialog {
         btnLogin.setForeground(textColor);
         btnLogin.setFocusPainted(false);
         btnLogin.setFont(fontButton);
-        btnLogin.setPreferredSize(new Dimension(150, 50));
+        btnLogin.setPreferredSize(new Dimension(100, 32)); // Tiny buttons
 
         btnExit = new JButton("Exit");
         btnExit.setBackground(themeRed);
         btnExit.setForeground(textColor);
         btnExit.setFocusPainted(false);
         btnExit.setFont(fontButton);
-        btnExit.setPreferredSize(new Dimension(150, 50));
+        btnExit.setPreferredSize(new Dimension(100, 32));
         btnExit.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 1));
 
         buttonPanel.add(btnLogin);
@@ -172,10 +185,11 @@ public class LoginDialog extends JDialog {
         add(headerPanel, BorderLayout.NORTH);
         add(centerWrapper, BorderLayout.CENTER);
 
-        // Footer for background color
+        // Footer for background color - restored and visible
         JPanel footerPanel = new JPanel();
         footerPanel.setBackground(themeRed);
-        footerPanel.setPreferredSize(new Dimension(0, 100));
+        footerPanel.setPreferredSize(new Dimension(0, 60)); // Increased height
+        footerPanel.setBorder(BorderFactory.createMatteBorder(3, 0, 0, 0, Color.YELLOW)); // Added yellow separator
         add(footerPanel, BorderLayout.SOUTH);
 
         // Login Button Logic
