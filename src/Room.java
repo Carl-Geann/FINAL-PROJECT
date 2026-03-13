@@ -48,7 +48,7 @@ public class Room {
         this.nights = 1;
         this.discount = 0.0;
         this.total = 0.0;
-        this.guestCount = 1;
+        this.guestCount = 0;
     }
 
     // Kini nga seksyon adunay mga Getter para makuha ang impormasyon sa kwarto.

@@ -1,78 +1,81 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Calendar;
+import java.util.stream.Collectors;
 
 /**
  * Kini nga class nga RoomTableHandler kay para sa pagdumala sa JTable UI display.
- * Kini ang nag-handle sa pag-update sa main room table ug sa guest list table gamit ang data gikan sa HotelManager.
+ * Kini ang nag-handle sa pag-update sa main room table gamit ang data gikan sa HotelManager.
  */
 public class RoomTableHandler {
-    // Mga model reference para sa main room table ug guest list table.
-    private DefaultTableModel model, guestModel;
+    // Mga model reference para sa main room table.
+    private DefaultTableModel model;
     // UI Label para ipakita ang kinatibuk-ang gidaghanon sa mga bisita nga anaa karon sa hotel.
     private JLabel lblTotalGuests;
-    // Mga filter component para sa main room table.
-    private JComboBox<String> cbFilterType, cbFilterStatus, cbFilterPayment;
+    // Search field para sa main room table.
+    private JTextField txtSearch;
+    // Current status filter (null, "Free", or "Booked")
+    private String currentStatusFilter = null;
     
     private HotelManager hotelManager;
 
     public RoomTableHandler(HotelReservationSystem system, HotelManager hotelManager,
                             JTable table, DefaultTableModel model, 
-                            JTable guestTable, DefaultTableModel guestModel,
                             JLabel lblTotalGuests,
-                            JComboBox<String> cbFilterType, JComboBox<String> cbFilterStatus, JComboBox<String> cbFilterPayment) {
+                            JTextField txtSearch) {
         // Initializing references
         this.hotelManager = hotelManager;
         this.model = model;
-        this.guestModel = guestModel;
         this.lblTotalGuests = lblTotalGuests;
-        this.cbFilterType = cbFilterType;
-        this.cbFilterStatus = cbFilterStatus;
-        this.cbFilterPayment = cbFilterPayment;
+        this.txtSearch = txtSearch;
     }
 
-    // Kini nga method naga-refresh sa Guest List table uban ang mga kwarto nga gi-book karon.
-    public void updateGuestListTable() {
-        guestModel.setRowCount(0);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        for (Room room : hotelManager.getBookedRooms()) {
-            Date bookOutDate = room.getBookOutAt();
-            
-            // Backup calculation if for some reason bookOutAt is still null
-            if (bookOutDate == null && room.getBookedAt() != null) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(room.getBookedAt());
-                cal.add(Calendar.DATE, room.getNights());
-                bookOutDate = cal.getTime();
-                room.setBookOutAt(bookOutDate); // Save it back to the room object
-            }
-
-            Object[] row = {
-                room.getRoomNo(),
-                room.getGuestName(),
-                room.getName(),
-                room.getBookedAt() != null ? sdf.format(room.getBookedAt()) : "",
-                bookOutDate != null ? sdf.format(bookOutDate) : ""
-            };
-            guestModel.addRow(row);
-        }
+    // Kini nga method nag-apply sa search filter sa main room table ug naga-update sa gidaghanon sa mga bisita.
+    public void searchRooms() {
+        showRoomsByStatus(currentStatusFilter);
     }
 
-    // Kini nga method nag-apply og mga filter sa main room table ug naga-update sa gidaghanon sa mga bisita.
-    public void filterRooms() {
-        String typeFilter = cbFilterType.getSelectedItem().toString();
-        String statusFilter = cbFilterStatus.getSelectedItem().toString();
-        String paymentFilter = cbFilterPayment.getSelectedItem().toString();
-
+    // Kini nga method naga-filter sa mga kwarto base sa ilang status (Free o Booked).
+    public void showRoomsByStatus(String statusFilter) {
+        this.currentStatusFilter = statusFilter;
+        String query = txtSearch.getText().toLowerCase().trim();
         model.setRowCount(0);
-        int totalGuestsIn = 0;
-
-        for (Room room : hotelManager.filterRooms(typeFilter, statusFilter, paymentFilter)) {
-            if ("Booked".equals(room.getStatus())) {
-                totalGuestsIn += room.getGuestCount();
+        
+        // Calculate global total guests regardless of filter
+        int globalTotalGuests = 0;
+        for (Room r : hotelManager.getAllRooms()) {
+            if ("Booked".equals(r.getStatus())) {
+                globalTotalGuests += r.getGuestCount();
             }
+        }
+
+        java.util.List<Room> filteredList = hotelManager.getAllRooms().stream().filter(room -> {
+            // Apply status filter if set
+            boolean matchesStatus = (statusFilter == null) || statusFilter.equals(room.getStatus());
+            
+            // Apply search query if set
+            boolean matchesQuery = query.isEmpty();
+            if (!matchesQuery) {
+                boolean matchesRoomNo = String.valueOf(room.getRoomNo()).contains(query);
+                boolean matchesName = room.getName().toLowerCase().contains(query);
+                boolean matchesRoomStatus = room.getStatus().toLowerCase().contains(query);
+                boolean matchesType = room.getType().toLowerCase().contains(query);
+                boolean matchesGuestName = room.getGuestName() != null && room.getGuestName().toLowerCase().contains(query);
+                boolean matchesPrice = room.getPrice().toLowerCase().contains(query);
+                boolean matchesNights = String.valueOf(room.getNights()).contains(query);
+                boolean matchesDiscount = String.valueOf(room.getDiscount()).contains(query);
+                boolean matchesTotal = String.valueOf(room.getTotal()).contains(query);
+                boolean matchesGuestCount = String.valueOf(room.getGuestCount()).contains(query);
+                boolean matchesPayment = room.getPaymentMethod().toLowerCase().contains(query);
+                
+                matchesQuery = matchesRoomNo || matchesName || matchesRoomStatus || matchesType || 
+                               matchesGuestName || matchesPrice || matchesNights || 
+                               matchesDiscount || matchesTotal || matchesGuestCount || matchesPayment;
+            }
+            
+            return matchesStatus && matchesQuery;
+        }).collect(Collectors.toList());
+
+        for (Room room : filteredList) {
             model.addRow(new Object[]{
                 room.getRoomNo(),
                 room.getName(),
@@ -87,31 +90,11 @@ public class RoomTableHandler {
                 room.getPaymentMethod()
             });
         }
-        lblTotalGuests.setText(" | Total Guests In: " + totalGuestsIn);
+        lblTotalGuests.setText(" | Total Guests In: " + globalTotalGuests);
     }
 
     // Kini nga method naga-update sa main room table uban ang kompleto nga listahan sa inventory.
     public void roomUpdateTable() {
-        model.setRowCount(0);
-        int totalGuestsIn = 0;
-        for (Room room : hotelManager.getAllRooms()) {
-            if ("Booked".equals(room.getStatus())) {
-                totalGuestsIn += room.getGuestCount();
-            }
-            model.addRow(new Object[]{
-                room.getRoomNo(),
-                room.getName(),
-                room.getStatus(),
-                room.getType(),
-                room.getGuestName(),
-                room.getPrice(),
-                room.getNights(),
-                room.getDiscount(),
-                room.getTotal(),
-                room.getGuestCount(),
-                room.getPaymentMethod()
-            });
-        }
-        lblTotalGuests.setText(" | Total Guests In: " + totalGuestsIn);
+        showRoomsByStatus(null);
     }
 }

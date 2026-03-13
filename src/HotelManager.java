@@ -46,9 +46,9 @@ public class HotelManager {
 
     // Kini nga method nagpuno sa inisyal nga inventory sa mga kwarto para sa lain-laing mga kategorya.
     private void seedInventory() {
-        seedType("VIP", "VIP", 10, "100");
-        seedType("Family", "Family", 10, "80");
-        seedType("Double Bed", "Double", 10, "60");
+        seedType("VIP BED", "VIP", 20, "100");
+        seedType("FAMILY BED", "Family", 20, "80");
+        seedType("COUPLE BED", "Couple", 20, "60");
     }
 
     // Kini nga method helper naghimo og daghang mga kwarto sa usa ka piho nga klase.
@@ -142,24 +142,26 @@ public class HotelManager {
 
     // This method provides the default price for each room category
     public String defaultPriceForType(String type) {
-        if ("VIP".equals(type)) return "100";
-        if ("Family".equals(type)) return "80";
+        if ("VIP BED".equals(type)) return "100";
+        if ("FAMILY BED".equals(type)) return "80";
+        if ("COUPLE BED".equals(type)) return "60";
         return "60";
     }
 
     // This method provides the base naming prefix for each room type
     public String baseForType(String type) {
-        if ("VIP".equals(type)) return "VIP";
-        if ("Family".equals(type)) return "Family";
+        if ("VIP BED".equals(type)) return "VIP";
+        if ("FAMILY BED".equals(type)) return "Family";
+        if ("COUPLE BED".equals(type)) return "Couple";
         return "Double";
     }
 
     // This method defines the room number ranges for each category
     public int[] rangeForType(String type) {
-        if ("VIP".equalsIgnoreCase(type)) return new int[]{1, 10};
-        if ("Family".equalsIgnoreCase(type)) return new int[]{11, 20};
-        if ("Double Bed".equalsIgnoreCase(type)) return new int[]{21, 30};
-        return new int[]{1, 30};
+        if ("VIP BED".equalsIgnoreCase(type)) return new int[]{1, 20};
+        if ("FAMILY BED".equalsIgnoreCase(type)) return new int[]{21, 40};
+        if ("COUPLE BED".equalsIgnoreCase(type)) return new int[]{41, 60};
+        return new int[]{1, 60};
     }
 
     // This method calculates the relative index within a room type range
@@ -168,13 +170,30 @@ public class HotelManager {
         return roomNo - r[0] + 1;
     }
 
-    // This method filters the list of rooms based on type, status, and payment method
-    public List<Room> filterRooms(String typeFilter, String statusFilter, String paymentFilter) {
+    // Kini nga method nag-filter sa listahan sa mga kwarto base sa query string sa tanang mga field.
+    public List<Room> searchRooms(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return getAllRooms();
+        }
+        
+        String lowerQuery = query.toLowerCase().trim();
         return rooms.stream().filter(room -> {
-            boolean matchesType = typeFilter.equals("All") || room.getType().equals(typeFilter);
-            boolean matchesStatus = statusFilter.equals("All") || room.getStatus().equals(statusFilter);
-            boolean matchesPayment = paymentFilter.equals("All") || room.getPaymentMethod().equals(paymentFilter);
-            return matchesType && matchesStatus && matchesPayment;
+            boolean matchesRoomNo = String.valueOf(room.getRoomNo()).contains(lowerQuery);
+            boolean matchesName = room.getName().toLowerCase().contains(lowerQuery);
+            boolean matchesStatus = room.getStatus().toLowerCase().contains(lowerQuery);
+            boolean matchesType = room.getType().toLowerCase().contains(lowerQuery);
+            boolean matchesGuestName = room.getGuestName() != null && room.getGuestName().toLowerCase().contains(lowerQuery);
+            boolean matchesPrice = room.getPrice().toLowerCase().contains(lowerQuery);
+            boolean matchesNights = String.valueOf(room.getNights()).contains(lowerQuery);
+            boolean matchesDiscount = String.valueOf(room.getDiscount()).contains(lowerQuery);
+            boolean matchesTotal = String.valueOf(room.getTotal()).contains(lowerQuery);
+            boolean matchesGuestCount = String.valueOf(room.getGuestCount()).contains(lowerQuery);
+            boolean matchesPayment = room.getPaymentMethod().toLowerCase().contains(lowerQuery);
+            
+            return matchesRoomNo || matchesName || matchesStatus || matchesType || 
+                   matchesGuestName || matchesPrice || matchesNights || 
+                   matchesDiscount || matchesTotal || matchesGuestCount || matchesPayment;
         }).collect(Collectors.toList());
     }
+
 }

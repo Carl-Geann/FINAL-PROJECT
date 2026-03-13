@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -15,11 +14,12 @@ public class HotelReservationSystem extends JFrame {
     // UI Components for input and selection
     private JComboBox<Integer> cbRoomNo, cbNights, cbGuestCount;
     private JTextField txtName, txtPrice, txtGuest, txtDiscount, txtTotalPayment;
-    private JComboBox<String> cbCategory, cbStatus, cbPaymentMethod, cbFilterType, cbFilterStatus, cbFilterPayment;
+    private JComboBox<String> cbCategory, cbStatus, cbPaymentMethod;
 
     // UI Components for data display
     private JTable table;
     private DefaultTableModel model;
+    private JTextField txtSearch;
 
     // Core logic managers
     private HotelManager hotelManager;
@@ -28,6 +28,7 @@ public class HotelReservationSystem extends JFrame {
     // Specialized UI logic handlers
     private RoomFormHandler formHandler;
     private RoomTableHandler tableHandler;
+    private GuestProfilePanel guestProfilePanel;
 
     // Buttons and Labels
     private JButton btnSave, btnBookOut, btnBookIn;
@@ -38,36 +39,47 @@ public class HotelReservationSystem extends JFrame {
     private JSpinner spBookingAt, spBookOutAt;
 
     // Navigation and Layout components
-    private JButton btnRoomDetails, btnGuestList;
-    private JPanel detailsPanel, guestListPanel, headerPanel;
+    private JButton btnRoomDetails, btnGuestProfile;
+    private JPanel detailsPanel, headerPanel;
     private JPanel actionsPanel;
     private JPanel leftContent; // This will have CardLayout
     private CardLayout leftCardLayout;
 
     private JSplitPane mainSplit;
 
-    // Guest List table components
-    private JTable guestTable;
-    private DefaultTableModel guestModel;
-
     public HotelReservationSystem() {
         // Kini nga code nag-initialize sa mga properties sa main JFrame window.
-        setTitle("Hotel Reservation List");
+        setTitle("UM DEL HOTEL - Reservation List");
         setSize(1200, 700);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+
+        // Set Window Icon
+        ImageIcon windowIcon = getScaledIcon("background log in.jpg", 64, 64);
+        if (windowIcon != null) {
+            setIconImage(windowIcon.getImage());
+        }
 
         // Initializing managers
         hotelManager = new HotelManager();
         authManager = new AuthManager();
 
         // Kini nga code nag-define sa mga font ug color para sa usa ka consistent nga UI theme.
-        Font tradeGothicBold = new Font("Arial", Font.BOLD, 12);
-        Font tradeGothicPlain = new Font("Arial", Font.BOLD, 12);
-        Font labelFont = new Font("Arial", Font.BOLD, 13);
-        Font fieldFont = new Font("Arial", Font.BOLD, 13);
-        Font headerFont = new Font("Arial", Font.BOLD, 15);
+        Font tradeGothicBold = new Font("Trade Gothic", Font.BOLD, 12);
+        if (tradeGothicBold.getFamily().equals("Dialog")) tradeGothicBold = new Font("Arial", Font.BOLD, 12);
+        
+        Font tradeGothicPlain = new Font("Trade Gothic", Font.PLAIN, 12);
+        if (tradeGothicPlain.getFamily().equals("Dialog")) tradeGothicPlain = new Font("Arial", Font.PLAIN, 12);
+        
+        Font labelFont = new Font("Trade Gothic", Font.BOLD, 13);
+        if (labelFont.getFamily().equals("Dialog")) labelFont = new Font("Arial", Font.BOLD, 13);
+        
+        Font fieldFont = new Font("Trade Gothic", Font.BOLD, 13);
+        if (fieldFont.getFamily().equals("Dialog")) fieldFont = new Font("Arial", Font.BOLD, 13);
+        
+        Font headerFont = new Font("Trade Gothic", Font.BOLD, 15);
+        if (headerFont.getFamily().equals("Dialog")) headerFont = new Font("Arial", Font.BOLD, 15);
 
         Color themeRed = new Color(150, 0, 0); // Maroon/Deep Red
         Color themeYellow = new Color(255, 255, 100); // Yellow
@@ -76,10 +88,6 @@ public class HotelReservationSystem extends JFrame {
         // Kini nga code nag-set up sa Room Details Form panel.
         detailsPanel = new JPanel(new BorderLayout(0, 5));
         detailsPanel.setBackground(themeRed);
-        
-        // Kini nga code nag-set up sa Guest List table panel.
-        guestListPanel = new JPanel(new BorderLayout());
-        guestListPanel.setBackground(themeRed);
 
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBackground(themeRed);
@@ -103,7 +111,7 @@ public class HotelReservationSystem extends JFrame {
         txtTotalPayment = new JTextField();
         txtTotalPayment.setEditable(false);
         cbGuestCount = new JComboBox<>();
-        cbCategory = new JComboBox<>(new String[]{"VIP", "Double Bed", "Family"});
+        cbCategory = new JComboBox<>(new String[]{"VIP BED", "FAMILY BED", "COUPLE BED"});
         cbStatus = new JComboBox<>(new String[]{"Free", "Booked"});
         cbPaymentMethod = new JComboBox<>(new String[]{"Credit Card", "Debit Card", "Cash", "Online Transfer"});
 
@@ -125,8 +133,12 @@ public class HotelReservationSystem extends JFrame {
 
         formHandler.updateGuestCountOptions();
 
-        // Kini nga code nagbutang og label ug nagdugang og mga field sa form panel.
+        // Kini nga code nag-initialize sa guest profile panel.
+        guestProfilePanel = new GuestProfilePanel(this, hotelManager, formHandler);
+
+        // Kini nga code nagdugang og label ug nagdugang og mga field sa form panel.
         String[] labels = {"Room No", "Room", "Category", "Guest Name", "Status", "Guests In", "Price", "Payment Method", "Discount", "Nights", "Total Payment", "Booking Date/Time", "Book Out"};
+        String[] iconPaths = {"room no.png", "room.png", "category.png", "guest list.png", "status.png", "occupied.png", "price.webp", "payment method.png", "discount.png", "nights.png", "total payment.png", "book_in.png", "book out.png"};
         JComponent[] fields = {cbRoomNo, txtName, cbCategory, txtGuest, cbStatus, cbGuestCount, txtPrice, cbPaymentMethod, txtDiscount, cbNights, txtTotalPayment, spBookingAt, spBookOutAt};
 
         for (JComponent field : fields) {
@@ -175,6 +187,14 @@ public class HotelReservationSystem extends JFrame {
             JLabel label = new JLabel(labels[i]);
             label.setFont(labelFont);
             label.setForeground(themeYellow);
+            
+            // Add Icon to Label
+            ImageIcon icon = getScaledIcon(iconPaths[i], 20, 20);
+            if (icon != null) {
+                label.setIcon(icon);
+                label.setIconTextGap(10);
+            }
+            
             formPanel.add(label, gbc);
 
             gbc.gridx = 1;
@@ -186,18 +206,9 @@ public class HotelReservationSystem extends JFrame {
         // Kini nga code naghimo sa mga action button (Save/Book In/Book Out).
         actionsPanel = new JPanel(new GridLayout(1, 3, 10, 0));
         actionsPanel.setBackground(themeRed);
-        btnSave = new JButton("Save");
-        btnBookIn = new JButton("Book In");
-        btnBookOut = new JButton("Book Out");
-
-        JButton[] actionButtons = {btnSave, btnBookIn, btnBookOut};
-        for (JButton btn : actionButtons) {
-            btn.setFont(tradeGothicBold);
-            btn.setBackground(themeYellow);
-            btn.setForeground(themeRed);
-            btn.setFocusPainted(false);
-            btn.setBorder(BorderFactory.createLineBorder(themeRed, 1));
-        }
+        btnSave = createActionButton("Save", tradeGothicBold, themeYellow, themeRed, "update.png");
+        btnBookIn = createActionButton("Book In", tradeGothicBold, themeYellow, themeRed, "book_in.png");
+        btnBookOut = createActionButton("Book Out", tradeGothicBold, themeYellow, themeRed, "book out.png");
 
         actionsPanel.add(btnSave);
         actionsPanel.add(btnBookIn);
@@ -209,30 +220,22 @@ public class HotelReservationSystem extends JFrame {
         leftPanel.setBackground(themeRed);
         leftPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         
-        // Kini nga code nag-initialize sa header panel nga adunay mga navigation button.
+        // Kini nga code nag-initialize sa header panel nga adunay navigation button.
         headerPanel = new JPanel(new GridLayout(1, 2, 10, 0));
         headerPanel.setBackground(themeRed);
         headerPanel.setPreferredSize(new Dimension(500, 45));
-        btnRoomDetails = new JButton("Room Details");
-        btnGuestList = new JButton("Guest List");
+        btnRoomDetails = createNavButton("Room Details", tradeGothicBold, themeYellow, themeRed, "roomdetails.png");
+        btnGuestProfile = createNavButton("Guest Profile", tradeGothicBold, themeYellow, themeRed, "guest list.png");
 
-        JButton[] navButtons = {btnRoomDetails, btnGuestList};
-        for (JButton btn : navButtons) {
-            btn.setFont(tradeGothicBold);
-            btn.setBackground(themeYellow);
-            btn.setForeground(themeRed);
-            btn.setFocusPainted(false);
-            btn.setBorder(BorderFactory.createLineBorder(themeRed, 1));
-        }
         headerPanel.add(btnRoomDetails);
-        headerPanel.add(btnGuestList);
+        headerPanel.add(btnGuestProfile);
 
         leftCardLayout = new CardLayout();
         leftContent = new JPanel(leftCardLayout);
         leftContent.setBackground(themeRed);
         
         leftContent.add(detailsPanel, "details");
-        leftContent.add(guestListPanel, "guests");
+        leftContent.add(guestProfilePanel, "guestProfile");
 
         leftPanel.add(headerPanel, BorderLayout.NORTH);
         leftPanel.add(leftContent, BorderLayout.CENTER);
@@ -247,76 +250,50 @@ public class HotelReservationSystem extends JFrame {
         detailsPanel.add(formScroll, BorderLayout.CENTER);
         detailsPanel.add(actionsPanel, BorderLayout.SOUTH);
 
-        // Kini nga code nag-set up sa Guest List table panel.
-        guestModel = new DefaultTableModel(new String[]{"Room No", "Guest Name", "Room Name", "Booked At", "Booked Out"}, 0);
-        guestTable = new JTable(guestModel);
-        guestTable.setFont(tradeGothicPlain);
-        guestTable.setBackground(lightYellow);
-        guestTable.setForeground(themeRed);
-        guestTable.setSelectionBackground(themeRed);
-        guestTable.setSelectionForeground(themeYellow);
-        guestTable.getTableHeader().setFont(tradeGothicBold);
-        guestTable.getTableHeader().setBackground(themeRed);
-        guestTable.getTableHeader().setForeground(themeYellow);
-        
-        // Kini nga code nag-set sa mga gilapdon sa kolum para sa Guest List table.
-        guestTable.getColumnModel().getColumn(0).setMinWidth(0);
-        guestTable.getColumnModel().getColumn(0).setMaxWidth(0);
-        guestTable.getColumnModel().getColumn(0).setPreferredWidth(0);
-        guestTable.getColumnModel().getColumn(1).setPreferredWidth(130); // Guest Name
-        guestTable.getColumnModel().getColumn(2).setPreferredWidth(100); // Room Name
-        guestTable.getColumnModel().getColumn(3).setPreferredWidth(130); // Booked At
-        guestTable.getColumnModel().getColumn(4).setPreferredWidth(130); // Booked Out
-
-        JScrollPane guestScroll = new JScrollPane(guestTable);
-        guestScroll.getViewport().setBackground(lightYellow);
-        guestListPanel.add(guestScroll, BorderLayout.CENTER);
-
         // Kini nga code nag-set up sa panel sa tuo nga bahin uban ang main room table.
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.setBackground(lightYellow);
         rightPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Kini nga code naghimo sa filter panel para sa room table.
+        // Kini nga code naghimo sa filter panel para sa room table uban ang search field.
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         filterPanel.setBackground(lightYellow);
-        cbFilterType = new JComboBox<>(new String[]{"All", "VIP", "Double Bed", "Family"});
-        cbFilterType.setFont(fieldFont);
-        cbFilterType.setBackground(Color.WHITE);
-        cbFilterType.setForeground(themeRed);
+        
+        JLabel searchLabel = new JLabel("Search:");
+        searchLabel.setFont(tradeGothicBold);
+        searchLabel.setForeground(themeRed);
+        
+        txtSearch = new JTextField(20);
+        txtSearch.setFont(fieldFont);
+        txtSearch.setBackground(Color.WHITE);
+        txtSearch.setForeground(themeRed);
+        
+        // Kini nga code naga-refresh sa table samtang nag-type ang user sa search field.
+        txtSearch.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { tableHandler.searchRooms(); }
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { tableHandler.searchRooms(); }
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { tableHandler.searchRooms(); }
+        });
 
-        cbFilterStatus = new JComboBox<>(new String[]{"All", "Free", "Booked"});
-        cbFilterStatus.setFont(fieldFont);
-        cbFilterStatus.setBackground(Color.WHITE);
-        cbFilterStatus.setForeground(themeRed);
+        JButton btnShowAll = createFilterButton("Show All", tradeGothicBold, themeRed, themeYellow, 120, "showall.png");
+        btnShowAll.addActionListener(e -> tableHandler.showRoomsByStatus(null));
 
-        cbFilterPayment = new JComboBox<>(new String[]{"All", "Credit Card", "Debit Card", "Cash", "Online Transfer"});
-        cbFilterPayment.setFont(fieldFont);
-        cbFilterPayment.setBackground(Color.WHITE);
-        cbFilterPayment.setForeground(themeRed);
+        JButton btnFreeRooms = createFilterButton("Free Rooms", tradeGothicBold, themeRed, themeYellow, 140, "free room.png");
+        btnFreeRooms.addActionListener(e -> tableHandler.showRoomsByStatus("Free"));
 
-        JButton btnRefresh = new JButton("Refresh");
-        btnRefresh.setPreferredSize(new Dimension(100, 35));
-        btnRefresh.setFont(tradeGothicBold);
-        btnRefresh.setBackground(themeRed);
-        btnRefresh.setForeground(themeYellow);
+        JButton btnOccupied = createFilterButton("Occupied Rooms", tradeGothicBold, themeRed, themeYellow, 180, "occupied.png");
+        btnOccupied.addActionListener(e -> tableHandler.showRoomsByStatus("Booked"));
 
-        JLabel typeLabel = new JLabel("Type:");
-        typeLabel.setFont(tradeGothicBold);
-        typeLabel.setForeground(themeRed);
-        JLabel statusLabel = new JLabel("Status:");
-        statusLabel.setFont(tradeGothicBold);
-        statusLabel.setForeground(themeRed);
-        JLabel paymentLabel = new JLabel("Payment:");
-        paymentLabel.setFont(tradeGothicBold);
-        paymentLabel.setForeground(themeRed);
+        JButton btnRefresh = createFilterButton("Refresh", tradeGothicBold, themeRed, themeYellow, 120, "refresh.png");
 
-        filterPanel.add(typeLabel);
-        filterPanel.add(cbFilterType);
-        filterPanel.add(statusLabel);
-        filterPanel.add(cbFilterStatus);
-        filterPanel.add(paymentLabel);
-        filterPanel.add(cbFilterPayment);
+        filterPanel.add(searchLabel);
+        filterPanel.add(txtSearch);
+        filterPanel.add(btnShowAll);
+        filterPanel.add(btnFreeRooms);
+        filterPanel.add(btnOccupied);
         filterPanel.add(btnRefresh);
 
         lblTotalGuests = new JLabel(" | Total Guests In: 0");
@@ -326,19 +303,24 @@ public class HotelReservationSystem extends JFrame {
 
         // Kini nga code nag-initialize sa main room table.
         String[] columns = {"Room No", "Room Name", "Status", "Type", "Guest Name", "Price", "Nights", "Discount", "Total", "Guests In", "Payment Method"};
-        model = new DefaultTableModel(columns, 0);
+        model = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         table = new JTable(model);
         table.setRowHeight(25);
         table.getTableHeader().setFont(tradeGothicBold);
         table.getTableHeader().setBackground(themeRed);
         table.getTableHeader().setForeground(themeYellow);
-        table.setFont(tradeGothicPlain);
+        table.setFont(tradeGothicBold);
         table.setBackground(lightYellow);
         table.setForeground(themeRed);
         table.setSelectionBackground(themeRed);
         table.setSelectionForeground(themeYellow);
         table.setShowGrid(true);
-        table.setGridColor(Color.LIGHT_GRAY);
+        table.setGridColor(themeRed);
 
         // Kini nga code nag-sentro sa teksto sa mga cell sa table.
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
@@ -370,7 +352,7 @@ public class HotelReservationSystem extends JFrame {
         rightPanel.add(scrollPane, BorderLayout.CENTER);
 
         // Kini nga code nag-initialize sa table handler para sa pagdumala sa data sa table.
-        tableHandler = new RoomTableHandler(this, hotelManager, table, model, guestTable, guestModel, lblTotalGuests, cbFilterType, cbFilterStatus, cbFilterPayment);
+        tableHandler = new RoomTableHandler(this, hotelManager, table, model, lblTotalGuests, txtSearch);
 
         // Kini nga code nag-combine sa mga panel gamit ang split pane.
         mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
@@ -386,36 +368,20 @@ public class HotelReservationSystem extends JFrame {
             updateActionButtons();
         });
 
-        btnGuestList.addActionListener(e -> {
-            tableHandler.updateGuestListTable();
-            leftCardLayout.show(leftContent, "guests");
-            updateActionButtons();
-        });
-
-        // Kini nga code nagdugang og selection listener sa guest table para sa sync.
-        guestTable.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting() && guestTable.getSelectedRow() != -1) {
-                try {
-                    int modelRow = guestTable.convertRowIndexToModel(guestTable.getSelectedRow());
-                    Object roomNoObj = guestModel.getValueAt(modelRow, 0);
-                    if (roomNoObj != null) {
-                        int roomNo = Integer.parseInt(roomNoObj.toString());
-                        Room room = hotelManager.findRoomByNo(roomNo);
-                        if (room != null) {
-                            formHandler.selectRoomInForm(room);
-                        }
-                    }
-                } catch (Exception ex) {
-                    // Ignored
-                }
-            }
+        btnGuestProfile.addActionListener(e -> {
+            Room selected = formHandler.getCurrentSelected();
+            guestProfilePanel.loadGuestData(selected);
+            leftCardLayout.show(leftContent, "guestProfile");
         });
 
         // Kini nga code nagdugang og mga action listener sa mga button.
         btnSave.addActionListener(e -> formHandler.saveRoom());
         btnBookIn.addActionListener(e -> formHandler.bookInRoom());
         btnBookOut.addActionListener(e -> formHandler.bookOutRoom());
-        btnRefresh.addActionListener(e -> tableHandler.filterRooms());
+        btnRefresh.addActionListener(e -> {
+            txtSearch.setText("");
+            tableHandler.roomUpdateTable(); // This resets the status filter and shows all
+        });
 
         // Kini nga code nagdugang og table selection listener para mapuno ang form.
         table.getSelectionModel().addListSelectionListener(e -> {
@@ -466,7 +432,7 @@ public class HotelReservationSystem extends JFrame {
         lblUser = new JLabel("");
         lblUser.setFont(labelFont);
         lblUser.setForeground(themeYellow);
-        btnSignOut = new JButton("");
+        btnSignOut = new JButton("Sign Out");
         btnSignOut.setFont(tradeGothicBold);
         btnSignOut.setBackground(themeYellow);
         btnSignOut.setForeground(themeRed);
@@ -475,6 +441,13 @@ public class HotelReservationSystem extends JFrame {
                 BorderFactory.createLineBorder(themeRed),
                 BorderFactory.createEmptyBorder(5, 15, 5, 15)
         ));
+        
+        ImageIcon signOutIcon = getScaledIcon("sign out.png", 20, 20);
+        if (signOutIcon != null) {
+            btnSignOut.setIcon(signOutIcon);
+            btnSignOut.setIconTextGap(10);
+        }
+        
         btnSignOut.addActionListener(e -> signOut());
         footer.add(lblUser, BorderLayout.WEST);
         footer.add(btnSignOut, BorderLayout.EAST);
@@ -527,7 +500,7 @@ public class HotelReservationSystem extends JFrame {
         lblUser.setText(enabled ? ("Signed in as " + authManager.getCurrentUser()) : "Signed out");
         btnSignOut.setEnabled(true);
         btnRoomDetails.setEnabled(true);
-        btnGuestList.setEnabled(true);
+        
     }
 
     // Kini nga method naga-update sa text ug state sa mga action button base sa pagpili.
@@ -554,7 +527,6 @@ public class HotelReservationSystem extends JFrame {
     // Kini nga method naga-refresh sa main room table.
     public void roomUpdateTable() {
         tableHandler.roomUpdateTable();
-        tableHandler.updateGuestListTable();
     }
 
     // Kini nga method naglimpyo sa gipili sa main table.
@@ -562,23 +534,116 @@ public class HotelReservationSystem extends JFrame {
         table.clearSelection();
     }
 
-    // Kini nga method nag-handle sa proseso sa pag-sign out (wala gigamit sa kini nga bersyon).
+    // Kini nga method nag-switch sa UI ngadto sa Room Details view.
+    public void showRoomDetails() {
+        leftCardLayout.show(leftContent, "details");
+    }
+
+    // Kini nga method nag-handle sa proseso sa pag-sign out.
     private void signOut() {
-        authManager.setSignedIn(true);
-        authManager.setCurrentUser("geann@gmail.com");
+        authManager.setSignedIn(false);
+        authManager.setCurrentUser(null);
         updateAuthUI();
         formHandler.clearFields();
+        setVisible(false);
+        
+        // Pagkahuman og sign out, ipakita pag-usab ang login dialog.
+        LoginDialog login = new LoginDialog(this, authManager);
+        login.setVisible(true);
+        
+        if (login.isAuthenticated()) {
+            setSignedIn(true);
+            setCurrentUser(login.getLoggedInUser());
+            updateAuthUI();
+            roomUpdateTable(); // Refresh the table after re-login
+            setVisible(true);
+        } else {
+            System.exit(0);
+        }
+    }
+
+    // Helper methods for UI Construction to clean up constructor
+    private ImageIcon getScaledIcon(String path, int width, int height) {
+        try {
+            java.net.URL imgURL = getClass().getResource("/pic/" + path);
+            if (imgURL != null) {
+                ImageIcon icon = new ImageIcon(imgURL);
+                Image img = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
+                return new ImageIcon(img);
+            }
+        } catch (Exception e) {
+            System.err.println("Could not load icon: " + path);
+        }
+        return null;
+    }
+
+    private JButton createNavButton(String text, Font font, Color bg, Color fg, String iconPath) {
+        JButton btn = new JButton(text);
+        btn.setFont(font);
+        btn.setBackground(bg);
+        btn.setForeground(fg);
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createLineBorder(fg, 1));
+        
+        ImageIcon icon = getScaledIcon(iconPath, 20, 20);
+        if (icon != null) {
+            btn.setIcon(icon);
+            btn.setIconTextGap(10);
+        }
+        
+        return btn;
+    }
+
+    private JButton createActionButton(String text, Font font, Color bg, Color fg, String iconPath) {
+        JButton btn = new JButton(text);
+        btn.setFont(font);
+        btn.setBackground(bg);
+        btn.setForeground(fg);
+        btn.setFocusPainted(false);
+        btn.setBorder(BorderFactory.createLineBorder(fg, 1));
+        
+        ImageIcon icon = getScaledIcon(iconPath, 20, 20);
+        if (icon != null) {
+            btn.setIcon(icon);
+            btn.setIconTextGap(10);
+        }
+        
+        return btn;
+    }
+
+    private JButton createFilterButton(String text, Font font, Color bg, Color fg, int width, String iconPath) {
+        JButton btn = new JButton(text);
+        btn.setPreferredSize(new Dimension(width, 35));
+        btn.setFont(font);
+        btn.setBackground(bg);
+        btn.setForeground(fg);
+        
+        ImageIcon icon = getScaledIcon(iconPath, 20, 20);
+        if (icon != null) {
+            btn.setIcon(icon);
+            btn.setIconTextGap(5);
+        }
+        
+        return btn;
     }
 
     // Kini nga code nga main method mao ang entry point nga nag-launch sa application.
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             HotelReservationSystem system = new HotelReservationSystem();
-            // Awtomatiko nga naga-sign in gamit ang default user para sa testing.
-            system.setSignedIn(true);
-            system.setCurrentUser("staff@hotel.com");
-            system.updateAuthUI();
-            system.setVisible(true);
+            
+            // Pagpakita sa login dialog sa dili pa ablihan ang main system.
+            LoginDialog login = new LoginDialog(system, system.authManager);
+            login.setVisible(true);
+            
+            if (login.isAuthenticated()) {
+                system.setSignedIn(true);
+                system.setCurrentUser(login.getLoggedInUser());
+                system.updateAuthUI();
+                system.setVisible(true);
+            } else {
+                System.exit(0);
+            }
         });
     }
 

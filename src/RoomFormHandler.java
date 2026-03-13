@@ -112,11 +112,14 @@ public class RoomFormHandler {
             return;
         }
         int maxGuests = 2;
-        String category = cbCategory.getSelectedItem().toString();
-        if ("VIP".equals(category)) {
+        Object sel = cbCategory.getSelectedItem();
+        String category = sel == null ? "" : sel.toString();
+        if ("VIP BED".equals(category)) {
             maxGuests = 10;
-        } else if ("Family".equals(category)) {
+        } else if ("FAMILY BED".equals(category)) {
             maxGuests = 7;
+        } else if ("COUPLE BED".equals(category)) {
+            maxGuests = 2;
         }
 
         Integer currentVal = (Integer) cbGuestCount.getSelectedItem();
