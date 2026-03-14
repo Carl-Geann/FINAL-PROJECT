@@ -6,8 +6,8 @@ import javax.swing.DefaultListCellRenderer;
 import java.awt.Component;
 
 /**
- * Kini nga class nga GuestProfilePanel kay para sa pagpakita ug pag-edit sa profile sa bisita.
- * Kini nagpakita sa mga detalye sa booking sama sa oras sa check-in/out, kwarto, ug bayad.
+ * Kini nga class nga GuestProfilePanel kay para sa pagpakita ug pag-edit sa profile sa bisita
+ * Kini nagpakita sa mga detalye sa booking sama sa oras sa check-in/out, kwarto, ug bayad
  */
 public class GuestProfilePanel extends JPanel {
     private JTextField txtGuestName, txtRoomName, txtGuestCount, txtPaymentMethod, txtBookInTime, txtBookOutTime, txtTotalAmount;

@@ -3,13 +3,13 @@ import javax.swing.table.DefaultTableModel;
 import java.util.stream.Collectors;
 
 /**
- * Kini nga class nga RoomTableHandler kay para sa pagdumala sa JTable UI display.
- * Kini ang nag-handle sa pag-update sa main room table gamit ang data gikan sa HotelManager.
+ * Kini nga class nga RoomTableHandler kay para sa pagdumala sa JTable UI display
+ * Kini ang nag-handle sa pag-update sa main room table gamit ang data gikan sa HotelManager
  */
 public class RoomTableHandler {
     // Mga model reference para sa main room table.
     private DefaultTableModel model;
-    // UI Label para ipakita ang kinatibuk-ang gidaghanon sa mga bisita nga anaa karon sa hotel.
+    // UI Label para ipakita ang kinatibuk-ang gidaghanon sa mga bisita nga anaa karon sa hotel
     private JLabel lblTotalGuests;
     // Search field para sa main room table.
     private JTextField txtSearch;
@@ -29,12 +29,12 @@ public class RoomTableHandler {
         this.txtSearch = txtSearch;
     }
 
-    // Kini nga method nag-apply sa search filter sa main room table ug naga-update sa gidaghanon sa mga bisita.
+    // Kini nga method nag-apply sa search filter sa main room table ug naga-update sa gidaghanon sa mga bisita
     public void searchRooms() {
         showRoomsByStatus(currentStatusFilter);
     }
 
-    // Kini nga method naga-filter sa mga kwarto base sa ilang status (Free o Booked).
+    // Kini nga method naga-filter sa mga kwarto base sa ilang status (Free o Booked)
     public void showRoomsByStatus(String statusFilter) {
         this.currentStatusFilter = statusFilter;
         String query = txtSearch.getText().toLowerCase().trim();
@@ -93,7 +93,7 @@ public class RoomTableHandler {
         lblTotalGuests.setText(" | Total Guests In: " + globalTotalGuests);
     }
 
-    // Kini nga method naga-update sa main room table uban ang kompleto nga listahan sa inventory.
+    // Kini nga method naga-update sa main room table uban ang kompleto nga listahan sa storage sa data
     public void roomUpdateTable() {
         showRoomsByStatus(null);
     }

@@ -20,14 +20,14 @@ public class LoginDialog extends JDialog {
         super(parent, "Hotel Login", true);
         this.authManager = authManager;
         
-        // Kini nga code nag-set sa size sa login dialog pareha sa dashboard.
+        // Kini nga code nag-set sa size sa login dialog 
         setSize(1200, 700);
         setLocationRelativeTo(null); // I-sentro ang window sa screen.
         setUndecorated(false); // Ipakita ang title bar ug window controls.
         setResizable(false); 
         setLayout(new BorderLayout());
 
-        // Kini nga code nag-set sa icon sa window.
+        // Kini nga code nag-set sa icon sa window
         ImageIcon windowIcon = getScaledIcon("logo.png", 64, 64);
         if (windowIcon != null) {
             setIconImage(windowIcon.getImage());
@@ -56,7 +56,7 @@ public class LoginDialog extends JDialog {
         headerPanel.setBackground(themeRed);
         headerPanel.setPreferredSize(new Dimension(0, 140)); // Mas gamay nga header.
 
-        // Kini nga code nagdugang og Logo sa Header.
+        // Kini nga code nagdugang og logo sa header
         ImageIcon logoIcon = getScaledIcon("logo.png", 130, 130); 
         if (logoIcon != null) {
             JLabel lblLogo = new JLabel(logoIcon);
@@ -208,7 +208,7 @@ public class LoginDialog extends JDialog {
             }
         });
 
-        // Exit Button Logic
+        // Exit Button 
         btnExit.addActionListener(e -> {
             authenticated = false;
             System.exit(0);

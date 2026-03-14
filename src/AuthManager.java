@@ -6,45 +6,45 @@ import java.util.Map;
  * Kini ang nagdumala sa user nga naka-sign in karon ug ang ilang status sa pag-login.
  */
 public class AuthManager {
-    // Kini nga boolean kay nagsubay kung ang user naka-login ba karon sa sistema.
+    // Kini nga boolean kay nagsubay kung ang user naka-login ba karon sa sistema
     private boolean signedIn = false;
-    // Kini nga string kay nagtipig sa email o username sa user nga naka-login karon.
+    // Kini nga string kay nagtipig sa email o username sa user nga naka-login karon
     private String currentUser;
-    // Kini nga map kay nagtipig sa mga rehistradong user ug ang ilang mga password.
+    // Kini nga map kay nagtipig sa mga rehistradong user ug ang ilang mga password
     private Map<String, String> users = new LinkedHashMap<>();
 
     public AuthManager() {
         // Nag-initialize sa mga default nga account sa user.
-        users.put("", "");
+        users.put("admin", "123");
         users.put("staff@hotel.com", "staff123");
     }
 
-    // Kini nga method kay nag-check kung naay naka-sign in.
+    // Kini nga method kay nag-check kung naay naka-sign in
     public boolean isSignedIn() {
         return signedIn;
     }
 
-    // Kini nga method kay naga-update sa status sa sign-in.
+    // Kini nga method kay naga-update sa status sa sign-in
     public void setSignedIn(boolean signedIn) {
         this.signedIn = signedIn;
     }
 
-    // Kini nga method kay nagkuha sa email sa user karon.
+    // Kini nga method kay nagkuha sa email sa user karon
     public String getCurrentUser() {
         return currentUser;
     }
 
-    // Kini nga method kay nag-set kung kinsa ang user karon.
+    // Kini nga method kay nag-set kung kinsa ang user karon
     public void setCurrentUser(String currentUser) {
         this.currentUser = currentUser;
     }
 
-    // Kini nga method kay nag-return sa map sa tanang rehistradong user.
+    // Kini nga method kay nag-return sa map sa tanang naka sign user
     public Map<String, String> getUsers() {
         return users;
     }
 
-    // Kini nga method kay nagtugot sa pag-update sa tibuok database sa mga user.
+    // Kini nga method kay nagpresent sa pag-update sa tibuok database sa mga user
     public void setUsers(Map<String, String> users) {
         this.users.clear();
         this.users.putAll(users);

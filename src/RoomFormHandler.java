@@ -134,7 +134,7 @@ public class RoomFormHandler {
         }
     }
 
-    // Kini nga method naga-update sa room number dropdown base sa napili nga kategorya.
+    // Kini nga method naga-update sa room number dropdown base sa napili nga kategorya
     public void updateRoomNoOptions() {
         if (cbRoomNo == null || cbCategory == null) {
             return;
@@ -149,7 +149,7 @@ public class RoomFormHandler {
         cbRoomNo.setSelectedIndex(-1);
     }
 
-    // Kini nga method nag-save o nag-update sa data sa kwarto gikan sa form ngadto sa inventory.
+    // Kini nga method nag-save o nag-update sa data sa kwarto gikan sa form ngadto sa inventory
     public void saveRoom() {
         String name = txtName.getText();
         String type = cbCategory.getSelectedItem().toString();
