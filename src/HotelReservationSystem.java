@@ -51,20 +51,20 @@ public class HotelReservationSystem extends JFrame {
         // Kini nga code nag-initialize sa mga properties sa main JFrame window.
         setTitle("UM DEL HOTEL - Reservation List");
         
-        // Set to full screen
+        // Kini nga code nag-set sa window sa full screen.
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setUndecorated(false); // Keep title bar for main dashboard to allow window controls
+        setUndecorated(false); // Atong ibilin ang title bar para sa main dashboard para naay window controls.
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Set Window Icon
+        // Kini nga code nag-set sa icon sa window.
         ImageIcon windowIcon = getScaledIcon("logo.png", 64, 64);
         if (windowIcon != null) {
             setIconImage(windowIcon.getImage());
         }
 
-        // Initializing managers
+        // Pag-initialize sa mga manager para sa data ug authentication.
         hotelManager = new HotelManager();
         authManager = new AuthManager();
 
@@ -456,7 +456,7 @@ public class HotelReservationSystem extends JFrame {
         footer.add(btnSignOut, BorderLayout.EAST);
         add(footer, BorderLayout.SOUTH);
 
-        // Initializing UI state
+        // Kini nga code nag-initialize sa UI state.
         formHandler.updateRoomNoOptions();
         roomUpdateTable();
         updateAuthUI();

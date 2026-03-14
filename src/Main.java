@@ -7,7 +7,7 @@ import javax.swing.SwingUtilities;
 public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            // Pag-initialize sa main system frame
+            // Pag-initialize sa main system frame.
             HotelReservationSystem system = new HotelReservationSystem();
             
             // Pagpakita sa login dialog sa dili pa ablihan ang main dashboard.
@@ -20,7 +20,7 @@ public class Main {
                 system.setSignedIn(true);
                 system.setCurrentUser(login.getLoggedInUser());
                 system.updateAuthUI();
-                system.roomUpdateTable(); // Sigurohon nga updated ang table pagkahuman og login
+                system.roomUpdateTable(); // Sigurohon nga updated ang table pagkahuman og login.
                 system.setVisible(true);
             } else {
                 // Kon i-close ang login window nga wala ka-authenticate, i-exit ang program.

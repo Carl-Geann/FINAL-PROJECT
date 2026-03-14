@@ -15,228 +15,91 @@ public class LoginDialog extends JDialog {
     private boolean authenticated = false;
     private String loggedInUser;
     private AuthManager authManager;
+    private final Color THEME_RED = new Color(150, 0, 0), LIGHT_YELLOW = new Color(255, 255, 240);
 
     public LoginDialog(JFrame parent, AuthManager authManager) {
         super(parent, "Hotel Login", true);
         this.authManager = authManager;
-        
-        // Make the dialog undecorated for a true full-screen immersive experience
-        setUndecorated(true);
-        
-        // Set to full screen size (usable area including taskbar or true full screen)
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setSize(screenSize.width, screenSize.height);
-        setLocation(0, 0);
-        setResizable(false); 
-        setLayout(new BorderLayout());
+        setSize(1200, 700); setLocationRelativeTo(null); setResizable(false); setLayout(new BorderLayout());
+        ImageIcon icon = getScaledIcon("logo.png", 64, 64); if (icon != null) setIconImage(icon.getImage());
+        initUI(); setupListeners();
+    }
 
-        // Set Window Icon
-        ImageIcon windowIcon = getScaledIcon("logo.png", 64, 64);
-        if (windowIcon != null) {
-            setIconImage(windowIcon.getImage());
-        }
+    private Font getFont(String name, int style, int size) {
+        Font f = new Font(name, style, size);
+        return f.getFamily().equals("Dialog") ? new Font("Arial", style, size) : f;
+    }
 
-        // Color theme para sa login (Red matching the hotel theme)
-        Color themeRed = new Color(150, 0, 0);
-        Color lightYellow = new Color(255, 255, 240);
-        Color textColor = Color.WHITE;
+    private void initUI() {
+        Font fHead = getFont("Brush Script MT", Font.BOLD, 72), fLabel = getFont("Trade Gothic", Font.BOLD, 18), fBtn = getFont("Trade Gothic", Font.BOLD, 18);
+        if (fHead.getFamily().equals("Arial")) fHead = getFont("Comic Sans MS", Font.BOLD, 72);
 
-        // Trade Gothic Fonts
-        Font fontHeader = new Font("Brush Script MT", Font.BOLD, 72); // Cursive font
-        if (fontHeader.getFamily().equals("Dialog")) fontHeader = new Font("Comic Sans MS", Font.BOLD, 72); // Fallback
-        
-        Font fontLabel = new Font("Trade Gothic", Font.BOLD, 18);
-        if (fontLabel.getFamily().equals("Dialog")) fontLabel = new Font("Arial", Font.BOLD, 18);
-        
-        Font fontField = new Font("Trade Gothic", Font.PLAIN, 18);
-        if (fontField.getFamily().equals("Dialog")) fontField = new Font("Arial", Font.PLAIN, 18);
-        
-        Font fontButton = new Font("Trade Gothic", Font.BOLD, 18);
-        if (fontButton.getFamily().equals("Dialog")) fontButton = new Font("Arial", Font.BOLD, 18);
+        JPanel header = new JPanel(new GridBagLayout()); header.setBackground(THEME_RED); header.setPreferredSize(new Dimension(0, 140));
+        ImageIcon logo = getScaledIcon("logo.png", 130, 130);
+        if (logo != null) { JLabel lblLogo = new JLabel(logo); lblLogo.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 30)); header.add(lblLogo); }
+        JLabel lblHeader = new JLabel("UM DEL HOTEL"); lblHeader.setFont(fHead); lblHeader.setForeground(Color.WHITE); header.add(lblHeader);
 
-        // Header Panel
-        JPanel headerPanel = new JPanel(new GridBagLayout());
-        headerPanel.setBackground(themeRed);
-        headerPanel.setPreferredSize(new Dimension(0, 140)); // Even sleeker header
-
-        // Add Logo to Header
-        ImageIcon logoIcon = getScaledIcon("logo.png", 130, 130); 
-        if (logoIcon != null) {
-            JLabel lblLogo = new JLabel(logoIcon);
-            lblLogo.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 30));
-            headerPanel.add(lblLogo);
-        }
-
-        JLabel lblHeader = new JLabel("UM DEL HOTEL");
-        lblHeader.setFont(fontHeader);
-        lblHeader.setForeground(textColor);
-        headerPanel.add(lblHeader);
-
-        // Center Wrapper Panel (to center the login box)
-        JPanel centerWrapper = new JPanel(new GridBagLayout()) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                java.net.URL imgURL = getClass().getResource("/pic/background login.jpg");
-                if (imgURL != null) {
-                    ImageIcon icon = new ImageIcon(imgURL);
-                    Image img = icon.getImage();
-                    // Draw full screen stretch fill
-                    g.drawImage(img, 0, 0, getWidth(), getHeight(), null);
-                }
+        JPanel center = new JPanel(new GridBagLayout()) {
+            @Override protected void paintComponent(Graphics g) {
+                super.paintComponent(g); java.net.URL url = getClass().getResource("/pic/background login.jpg");
+                if (url != null) g.drawImage(new ImageIcon(url).getImage(), 0, 0, getWidth(), getHeight(), null);
             }
         };
-        centerWrapper.setBackground(themeRed);
 
-        // Login Box - Adjusted to be even smaller as requested
-        JPanel loginBox = new JPanel(new BorderLayout(0, 10)); 
-        loginBox.setBackground(lightYellow);
-        loginBox.setPreferredSize(new Dimension(500, 280)); // Even more compact
-        loginBox.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(Color.YELLOW, 3), 
-            BorderFactory.createEmptyBorder(15, 35, 15, 35) // Tighter padding
-        ));
+        JPanel loginBox = new JPanel(new BorderLayout(0, 10)); loginBox.setBackground(LIGHT_YELLOW); loginBox.setPreferredSize(new Dimension(500, 280));
+        loginBox.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.YELLOW, 3), BorderFactory.createEmptyBorder(15, 35, 15, 35)));
 
-        // Form Panel inside Login Box
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setOpaque(false);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5); 
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        JPanel form = new JPanel(new GridBagLayout()); form.setOpaque(false);
+        GridBagConstraints gbc = new GridBagConstraints(); gbc.insets = new Insets(5, 5, 5, 5); gbc.fill = GridBagConstraints.HORIZONTAL;
+        txtUsername = createField(fBtn); txtPassword = new JPasswordField(15); txtPassword.setFont(fBtn); txtPassword.setForeground(THEME_RED); txtPassword.setBorder(BorderFactory.createLineBorder(THEME_RED, 1)); txtPassword.setPreferredSize(new Dimension(280, 32));
+        addLabelField(form, "Username/Email:", txtUsername, "guest list.png", fLabel, gbc, 0);
+        addLabelField(form, "Password:", txtPassword, "password.png", fLabel, gbc, 1);
 
-        // Username
-        gbc.gridx = 0; gbc.gridy = 0;
-        gbc.weightx = 0.3;
-        JLabel lblUser = new JLabel("Username/Email:");
-        lblUser.setFont(fontLabel);
-        lblUser.setForeground(themeRed);
-        
-        ImageIcon userIcon = getScaledIcon("guest list.png", 24, 24); 
-        if (userIcon != null) {
-            lblUser.setIcon(userIcon);
-            lblUser.setIconTextGap(10);
-        }
-        
-        formPanel.add(lblUser, gbc);
+        JPanel btns = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0)); btns.setOpaque(false);
+        btnLogin = createBtn("Login", fBtn); btnExit = createBtn("Exit", fBtn); btnExit.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 1));
+        btns.add(btnLogin); btns.add(btnExit);
+        loginBox.add(form, BorderLayout.CENTER); loginBox.add(btns, BorderLayout.SOUTH);
+        center.add(loginBox);
 
-        gbc.gridx = 1;
-        gbc.weightx = 0.7;
-        txtUsername = new JTextField(15);
-        txtUsername.setFont(fontButton); 
-        txtUsername.setForeground(themeRed);
-        txtUsername.setBackground(Color.WHITE);
-        txtUsername.setBorder(BorderFactory.createLineBorder(themeRed, 1)); 
-        txtUsername.setPreferredSize(new Dimension(280, 32)); // Narrower and smaller height
-        formPanel.add(txtUsername, gbc);
+        JPanel footer = new JPanel(); footer.setBackground(THEME_RED); footer.setPreferredSize(new Dimension(0, 60)); footer.setBorder(BorderFactory.createMatteBorder(3, 0, 0, 0, Color.YELLOW));
+        add(header, BorderLayout.NORTH); add(center, BorderLayout.CENTER); add(footer, BorderLayout.SOUTH);
+    }
 
-        // Password
-        gbc.gridx = 0; gbc.gridy = 1;
-        gbc.weightx = 0.3;
-        JLabel lblPass = new JLabel("Password:");
-        lblPass.setFont(fontLabel);
-        lblPass.setForeground(themeRed);
-        
-        ImageIcon passIcon = getScaledIcon("password.png", 24, 24);
-        if (passIcon != null) {
-            lblPass.setIcon(passIcon);
-            lblPass.setIconTextGap(10);
-        }
-        
-        formPanel.add(lblPass, gbc);
+    private JTextField createField(Font f) {
+        JTextField tf = new JTextField(15); tf.setFont(f); tf.setForeground(THEME_RED); tf.setBackground(Color.WHITE); tf.setBorder(BorderFactory.createLineBorder(THEME_RED, 1)); tf.setPreferredSize(new Dimension(280, 32));
+        return tf;
+    }
 
-        gbc.gridx = 1;
-        gbc.weightx = 0.7;
-        txtPassword = new JPasswordField(15);
-        txtPassword.setFont(fontButton);
-        txtPassword.setForeground(themeRed);
-        txtPassword.setBackground(Color.WHITE);
-        txtPassword.setBorder(BorderFactory.createLineBorder(themeRed, 1));
-        txtPassword.setPreferredSize(new Dimension(280, 32)); 
-        formPanel.add(txtPassword, gbc);
+    private void addLabelField(JPanel p, String text, JComponent field, String icon, Font f, GridBagConstraints gbc, int y) {
+        gbc.gridx = 0; gbc.gridy = y; gbc.weightx = 0.3;
+        JLabel lbl = new JLabel(text); lbl.setFont(f); lbl.setForeground(THEME_RED);
+        ImageIcon img = getScaledIcon(icon, 24, 24); if (img != null) { lbl.setIcon(img); lbl.setIconTextGap(10); }
+        p.add(lbl, gbc);
+        gbc.gridx = 1; gbc.weightx = 0.7; p.add(field, gbc);
+    }
 
-        // Buttons Panel inside Login Box
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0)); 
-        buttonPanel.setOpaque(false);
+    private JButton createBtn(String t, Font f) {
+        JButton b = new JButton(t); b.setBackground(THEME_RED); b.setForeground(Color.WHITE); b.setFocusPainted(false); b.setFont(f); b.setPreferredSize(new Dimension(100, 32));
+        return b;
+    }
 
-        btnLogin = new JButton("Login");
-        btnLogin.setBackground(themeRed);
-        btnLogin.setForeground(textColor);
-        btnLogin.setFocusPainted(false);
-        btnLogin.setFont(fontButton);
-        btnLogin.setPreferredSize(new Dimension(100, 32)); // Tiny buttons
-
-        btnExit = new JButton("Exit");
-        btnExit.setBackground(themeRed);
-        btnExit.setForeground(textColor);
-        btnExit.setFocusPainted(false);
-        btnExit.setFont(fontButton);
-        btnExit.setPreferredSize(new Dimension(100, 32));
-        btnExit.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 1));
-
-        buttonPanel.add(btnLogin);
-        buttonPanel.add(btnExit);
-
-        loginBox.add(formPanel, BorderLayout.CENTER);
-        loginBox.add(buttonPanel, BorderLayout.SOUTH);
-
-        centerWrapper.add(loginBox);
-
-        // Add panels to dialog
-        add(headerPanel, BorderLayout.NORTH);
-        add(centerWrapper, BorderLayout.CENTER);
-
-        // Footer for background color - restored and visible
-        JPanel footerPanel = new JPanel();
-        footerPanel.setBackground(themeRed);
-        footerPanel.setPreferredSize(new Dimension(0, 60)); // Increased height
-        footerPanel.setBorder(BorderFactory.createMatteBorder(3, 0, 0, 0, Color.YELLOW)); // Added yellow separator
-        add(footerPanel, BorderLayout.SOUTH);
-
-        // Login Button Logic
-        btnLogin.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String user = txtUsername.getText();
-                String pass = new String(txtPassword.getPassword());
-
-                Map<String, String> users = authManager.getUsers();
-                if (users.containsKey(user) && users.get(user).equals(pass)) {
-                    authenticated = true;
-                    loggedInUser = user;
-                    dispose();
-                } else {
-                    JOptionPane.showMessageDialog(LoginDialog.this, 
-                        "Wrong email or password!", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
+    private void setupListeners() {
+        btnLogin.addActionListener(e -> {
+            String u = txtUsername.getText(), p = new String(txtPassword.getPassword());
+            if (authManager.getUsers().containsKey(u) && authManager.getUsers().get(u).equals(p)) { authenticated = true; loggedInUser = u; dispose(); }
+            else JOptionPane.showMessageDialog(this, "Wrong email or password!", "Error", JOptionPane.ERROR_MESSAGE);
         });
-
-        // Exit Button Logic
-        btnExit.addActionListener(e -> {
-            authenticated = false;
-            System.exit(0);
-        });
+        btnExit.addActionListener(e -> System.exit(0));
     }
 
-    public boolean isAuthenticated() {
-        return authenticated;
-    }
+    public boolean isAuthenticated() { return authenticated; }
+    public String getLoggedInUser() { return loggedInUser; }
 
-    public String getLoggedInUser() {
-        return loggedInUser;
-    }
-
-    private ImageIcon getScaledIcon(String path, int width, int height) {
+    private ImageIcon getScaledIcon(String path, int w, int h) {
         try {
-            java.net.URL imgURL = getClass().getResource("/pic/" + path);
-            if (imgURL != null) {
-                ImageIcon icon = new ImageIcon(imgURL);
-                Image img = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
-                return new ImageIcon(img);
-            }
-        } catch (Exception e) {
-            System.err.println("Could not load icon: " + path);
-        }
+            java.net.URL url = getClass().getResource("/pic/" + path);
+            if (url != null) return new ImageIcon(new ImageIcon(url).getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH));
+        } catch (Exception e) { System.err.println("Could not load icon: " + path); }
         return null;
     }
 }
