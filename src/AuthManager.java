@@ -2,8 +2,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Kini nga class nga AuthManager kay para sa pag-handle sa user authentication ug session state.
- * Kini ang nagdumala sa user nga naka-sign in karon ug ang ilang status sa pag-login.
+ * Kini nga class nga AuthManager kay para sa pag-handle sa user authentication ug session state
+ * Kini ang nagdumala sa user nga naka-sign in karon ug ang ilang status sa pag-login
  */
 public class AuthManager {
     // Kini nga boolean kay nagsubay kung ang user naka-login ba karon sa sistema
@@ -14,7 +14,7 @@ public class AuthManager {
     private Map<String, String> users = new LinkedHashMap<>();
 
     public AuthManager() {
-        // Nag-initialize sa mga default nga account sa user.
+        // Nag-initialize sa mga default nga account sa user
         users.put("admin", "123");
         users.put("staff@hotel.com", "staff123");
     }

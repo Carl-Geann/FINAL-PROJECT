@@ -1,8 +1,8 @@
 import javax.swing.SwingUtilities;
 
 /**
- * Kini nga class nga Main mao ang entry point sa tibuok application.
- * Kini ang nag-coordinate sa pag-launch sa LoginDialog ug sa main HotelReservationSystem.
+ * Kini nga class nga Main mao ang entry point sa tibuok application
+ * Kini ang nag-coordinate sa pag-launch sa LoginDialog ug sa main HotelReservationSystem
  */
 public class Main {
     public static void main(String[] args) {
