@@ -10,25 +10,33 @@ import java.awt.Component;
  * Kini nagpakita sa mga detalye sa booking sama sa oras sa check-in/out, kwarto, ug bayad.
  */
 public class GuestProfilePanel extends JPanel {
+    // --- [1. UI Components para sa Inputs] ---
     private JTextField txtGuestName, txtRoomName, txtBookInTime, txtBookOutTime, txtTotalAmount, txtDiscount;
     private JComboBox<Integer> cbGuestCount, cbNights;
     private JComboBox<String> cbPaymentMethod;
     private JButton btnUpdate, btnBookOut;
     private JList<Room> guestList;
     private DefaultListModel<Room> listModel;
+    
+    // --- [2. Logic Managers ug Data] ---
     private HotelReservationSystem system;
     private HotelManager hotelManager;
     private RoomFormHandler formHandler;
     private Room currentRoom;
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     private boolean isLoading = false;
-    private final Color THEME_RED = new Color(150, 0, 0), LIGHT_YELLOW = new Color(255, 255, 224); // Creamier yellow
+    private final Color THEME_RED = new Color(150, 0, 0), LIGHT_YELLOW = new Color(255, 255, 224);
 
+    // --- [Method Group: Initialization] ---
+    
+    /**
+     * Constructor para sa pag-setup sa panel
+     */
     public GuestProfilePanel(HotelReservationSystem system, HotelManager hotelManager, RoomFormHandler formHandler) {
         this.system = system; this.hotelManager = hotelManager; this.formHandler = formHandler;
-        initComponents(); 
-        initLayout();     
-        initListeners();  
+        initComponents(); // I-initialize ang mga components
+        initLayout();     // I-set up ang visual structure
+        initListeners();  // I-attach ang mga action listeners
     }
 
     private Font getFont(int size) {
@@ -43,14 +51,15 @@ public class GuestProfilePanel extends JPanel {
         guestList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         guestList.setFont(fontField); guestList.setForeground(THEME_RED); guestList.setFixedCellHeight(30); 
         
+        // Custom renderer para sa listahan sa mga bisita
         guestList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                label.setFont(fontField); // Siguradohon nga bold ang font sa list
                 if (value instanceof Room) {
                     Room r = (Room) value;
                     label.setText(" " + (r.getGuestName() != null ? r.getGuestName().toUpperCase() : "") + " - " + r.getName());
-                    label.setFont(fontField);
                 }
                 label.setBackground(isSelected ? THEME_RED : Color.WHITE);
                 label.setForeground(isSelected ? Color.YELLOW : THEME_RED);
@@ -58,22 +67,114 @@ public class GuestProfilePanel extends JPanel {
             }
         });
 
+        // Pag-create sa mga text fields
         txtGuestName = createField(fontField, 240);
         txtRoomName = createField(fontField, 240); txtRoomName.setEditable(false);
         
+        // Pag-setup sa mga combo boxes
         cbGuestCount = createComboBox(fontField, 240);
         cbPaymentMethod = createComboBox(fontField, 240);
         cbPaymentMethod.setModel(new DefaultComboBoxModel<>(new String[]{"Credit Card", "Debit Card", "Cash", "Online Transfer"}));
         cbNights = createComboBox(fontField, 240);
         for (int i = 1; i <= 7; i++) cbNights.addItem(i);
 
+        // Uban pang mga fields
         txtBookInTime = createField(fontField, 240); txtBookInTime.setEditable(false);
         txtBookOutTime = createField(fontField, 240); txtBookOutTime.setEditable(false);
         txtDiscount = createField(fontField, 240); 
         txtTotalAmount = createField(fontField, 240); txtTotalAmount.setEditable(false);
 
+        // Pag-style sa mga buttons
         btnUpdate = styleButton(new JButton("Update Profile"), getFont(14));
         btnBookOut = styleButton(new JButton("Book Out Room"), getFont(14));
+    }
+
+    private void initLayout() {
+        setLayout(new BorderLayout()); setBackground(THEME_RED); setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
+        // Header label para sa panel
+        JLabel lblHeader = new JLabel("GUEST PROFILE", SwingConstants.CENTER);
+        lblHeader.setFont(getFont(22)); lblHeader.setForeground(Color.YELLOW); 
+        lblHeader.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
+        add(lblHeader, BorderLayout.NORTH);
+
+        // Main container para sa listahan ug form nga dunay GridBagLayout
+        JPanel mainContainer = new JPanel(new GridBagLayout());
+        mainContainer.setBackground(LIGHT_YELLOW);
+        mainContainer.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(Color.YELLOW, 2), 
+            BorderFactory.createEmptyBorder(10, 10, 10, 10) 
+        ));
+
+        GridBagConstraints mg = new GridBagConstraints();
+        mg.gridx = 0; mg.fill = GridBagConstraints.BOTH; mg.weightx = 1.0;
+
+        // ScrollPane para sa listahan sa mga bisita
+        JScrollPane scrollPane = new JScrollPane(guestList);
+        scrollPane.setPreferredSize(new Dimension(450, 250)); 
+        scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(THEME_RED, 2), "Currently Booked Guests", 0, 0, getFont(16), THEME_RED));
+        mg.gridy = 0; mg.weighty = 0.5;
+        mainContainer.add(scrollPane, mg);
+
+        // Form panel para sa mga detalye sa bisita
+        JPanel formPanel = new JPanel(new GridBagLayout()); 
+        formPanel.setBackground(LIGHT_YELLOW);
+        GridBagConstraints fg = new GridBagConstraints();
+        fg.insets = new Insets(6, 5, 6, 5); 
+        fg.fill = GridBagConstraints.NONE; 
+        fg.anchor = GridBagConstraints.WEST;
+
+        // Idugang ang mga labels ug fields sa form panel
+        String[] labels = {"Guest Name : ", "Room : ", "Number of Guests : ", "Payment Method : ", "Nights : ", "Book In Time : ", "Book Out Time : ", "Discount : ", "Total Amount : "};
+        JComponent[] components = {txtGuestName, txtRoomName, cbGuestCount, cbPaymentMethod, cbNights, txtBookInTime, txtBookOutTime, txtDiscount, txtTotalAmount};
+        for (int i = 0; i < labels.length; i++) addLabelAndComponent(formPanel, labels[i], components[i], fg, i);
+
+        mg.gridy = 1; mg.weighty = 0.5;
+        mg.insets = new Insets(15, 0, 0, 0); 
+        mainContainer.add(formPanel, mg);
+
+        add(mainContainer, BorderLayout.CENTER);
+
+        // Action buttons sa ubos (Update ug Book Out)
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 5)); 
+        btnPanel.setBackground(THEME_RED);
+        btnPanel.add(btnUpdate); btnPanel.add(btnBookOut); 
+        add(btnPanel, BorderLayout.SOUTH);
+    }
+
+    private void initListeners() {
+        // Listener para sa pag-update sa profile inig click sa button
+        btnUpdate.addActionListener(e -> updateProfile()); 
+        
+        // Listener para sa pag-book out sa kwarto inig click sa button
+        btnBookOut.addActionListener(e -> bookOut());     
+        
+        // Listener inig pili og bisita gikan sa listahan
+        guestList.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && !isLoading && guestList.getSelectedValue() != null) loadGuestData(guestList.getSelectedValue());
+        });
+        
+        // Listeners para sa awtomatiko nga pagkalkula sa total ug book-out date
+        cbNights.addActionListener(e -> updateBookOutDateAndTotal());
+        cbGuestCount.addActionListener(e -> updateBookOutDateAndTotal());
+        
+        // Listener para sa pagkalkula sa total inig usab sa discount (gamit ang keyboard)
+        txtDiscount.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyReleased(java.awt.event.KeyEvent e) {
+                updateBookOutDateAndTotal();
+            }
+        });
+    }
+
+    // --- [Method Group: UI Helpers] ---
+
+    private JTextField createField(Font font, int width) {
+        JTextField f = new JTextField(); f.setFont(font); f.setForeground(THEME_RED); f.setBackground(Color.WHITE);
+        f.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.RED, 2), BorderFactory.createEmptyBorder(2, 8, 2, 8))); 
+        f.setPreferredSize(new Dimension(width, 32)); 
+        addFocusEffect(f);
+        return f;
     }
 
     private <T> JComboBox<T> createComboBox(Font font, int width) {
@@ -86,7 +187,25 @@ public class GuestProfilePanel extends JPanel {
         return cb;
     }
 
-    // Method para sa pagdugang og focus ug hover effects sa mga components
+    private JButton styleButton(JButton btn, Font font) {
+        btn.setFont(font); btn.setBackground(Color.YELLOW); btn.setForeground(THEME_RED);
+        btn.setFocusPainted(false); btn.setPreferredSize(new Dimension(150, 35)); 
+        btn.setBorder(BorderFactory.createLineBorder(THEME_RED, 1));
+        return btn;
+    }
+
+    private void addLabelAndComponent(JPanel p, String text, JComponent gbc_comp, GridBagConstraints gbc, int row) {
+        gbc.gridy = row; gbc.gridx = 0; gbc.weightx = 0.5; 
+        gbc.anchor = GridBagConstraints.EAST;
+        JLabel lbl = new JLabel(text); lbl.setFont(getFont(14)); lbl.setForeground(THEME_RED); 
+        lbl.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 15)); 
+        p.add(lbl, gbc);
+        
+        gbc.gridx = 1; gbc.weightx = 0.5; 
+        gbc.anchor = GridBagConstraints.WEST;
+        p.add(gbc_comp, gbc);
+    }
+
     private void addFocusEffect(JComponent c) {
         c.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
@@ -130,112 +249,15 @@ public class GuestProfilePanel extends JPanel {
         });
     }
 
-    private void initLayout() {
-        setLayout(new BorderLayout()); setBackground(THEME_RED); setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+    // --- [Method Group: Profile Logic] ---
 
-        JLabel lblHeader = new JLabel("GUEST PROFILE", SwingConstants.CENTER);
-        lblHeader.setFont(getFont(22)); lblHeader.setForeground(Color.YELLOW); 
-        lblHeader.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
-        add(lblHeader, BorderLayout.NORTH);
-
-        // Main container para sa listahan ug form
-        JPanel mainContainer = new JPanel(new GridBagLayout());
-        mainContainer.setBackground(LIGHT_YELLOW);
-        mainContainer.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(Color.YELLOW, 2), 
-            BorderFactory.createEmptyBorder(10, 10, 10, 10) // Reduced padding to match 2nd pic
-        ));
-
-        GridBagConstraints mg = new GridBagConstraints();
-        mg.gridx = 0; mg.fill = GridBagConstraints.BOTH; mg.weightx = 1.0;
-
-        // Listahan sa mga bisita - Adjusted size to be taller
-        JScrollPane scrollPane = new JScrollPane(guestList);
-        scrollPane.setPreferredSize(new Dimension(450, 250)); 
-        scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(THEME_RED, 2), "Currently Booked Guests", 0, 0, getFont(16), THEME_RED));
-        mg.gridy = 0; mg.weighty = 0.5;
-        mainContainer.add(scrollPane, mg);
-
-        // Form fields - Aligned to match 2nd pic
-        JPanel formPanel = new JPanel(new GridBagLayout()); 
-        formPanel.setBackground(LIGHT_YELLOW);
-        GridBagConstraints fg = new GridBagConstraints();
-        fg.insets = new Insets(6, 5, 6, 5); 
-        fg.fill = GridBagConstraints.NONE; 
-        fg.anchor = GridBagConstraints.WEST;
-
-        String[] labels = {"Guest Name : ", "Room : ", "Number of Guests : ", "Payment Method : ", "Nights : ", "Book In Time : ", "Book Out Time : ", "Discount : ", "Total Amount : "};
-        JComponent[] components = {txtGuestName, txtRoomName, cbGuestCount, cbPaymentMethod, cbNights, txtBookInTime, txtBookOutTime, txtDiscount, txtTotalAmount};
-        for (int i = 0; i < labels.length; i++) addLabelAndComponent(formPanel, labels[i], components[i], fg, i);
-
-        mg.gridy = 1; mg.weighty = 0.5;
-        mg.insets = new Insets(15, 0, 0, 0); 
-        mainContainer.add(formPanel, mg);
-
-        add(mainContainer, BorderLayout.CENTER);
-
-        // Action buttons sa ubos - Smaller to match 2nd pic
-        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 5)); 
-        btnPanel.setBackground(THEME_RED);
-        btnPanel.add(btnUpdate); btnPanel.add(btnBookOut); 
-        add(btnPanel, BorderLayout.SOUTH);
-    }
-
-    private void initListeners() {
-        btnUpdate.addActionListener(e -> updateProfile()); // Listener para sa pag-update sa profile
-        btnBookOut.addActionListener(e -> bookOut());     // Listener para sa pag-book out
-        
-        // Listener inig pili og bisita sa listahan
-        guestList.addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting() && !isLoading && guestList.getSelectedValue() != null) loadGuestData(guestList.getSelectedValue());
-        });
-        
-        // Listener para sa pagkalkula sa total inig usab sa nights
-        cbNights.addActionListener(e -> updateBookOutDateAndTotal());
-        cbGuestCount.addActionListener(e -> updateBookOutDateAndTotal());
-        
-        // Listener para sa pagkalkula sa total inig usab sa discount
-        txtDiscount.addKeyListener(new java.awt.event.KeyAdapter() {
-            @Override
-            public void keyReleased(java.awt.event.KeyEvent e) {
-                updateBookOutDateAndTotal();
-            }
-        });
-    }
-
-    private JTextField createField(Font font, int width) {
-        JTextField f = new JTextField(); f.setFont(font); f.setForeground(THEME_RED); f.setBackground(Color.WHITE);
-        f.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.RED, 2), BorderFactory.createEmptyBorder(2, 8, 2, 8))); 
-        f.setPreferredSize(new Dimension(width, 32)); 
-        addFocusEffect(f);
-        return f;
-    }
-
-    private void addLabelAndComponent(JPanel p, String text, JComponent gbc_comp, GridBagConstraints gbc, int row) {
-        gbc.gridy = row; gbc.gridx = 0; gbc.weightx = 0.5; // Shared weight
-        gbc.anchor = GridBagConstraints.EAST;
-        JLabel lbl = new JLabel(text); lbl.setFont(getFont(14)); lbl.setForeground(THEME_RED); 
-        lbl.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 15)); 
-        p.add(lbl, gbc);
-        
-        gbc.gridx = 1; gbc.weightx = 0.5; // Shared weight
-        gbc.anchor = GridBagConstraints.WEST;
-        p.add(gbc_comp, gbc);
-    }
-
-    private JButton styleButton(JButton btn, Font font) {
-        btn.setFont(font); btn.setBackground(Color.YELLOW); btn.setForeground(THEME_RED);
-        btn.setFocusPainted(false); btn.setPreferredSize(new Dimension(150, 35)); // Smaller buttons
-        btn.setBorder(BorderFactory.createLineBorder(THEME_RED, 1));
-        return btn;
-    }
-
-    // Method para sa pag-load sa data sa napili nga bisita
+    /**
+     * I-load ang data sa napili nga bisita gikan sa listahan
+     */
     public void loadGuestData(Room room) {
         if (isLoading) return;
         isLoading = true; refreshGuestList(); this.currentRoom = room;
         if (room != null && "Booked".equals(room.getStatus())) {
-            // I-fill ang mga fields base sa room data
             if (guestList.getSelectedValue() != room) guestList.setSelectedValue(room, true);
             txtGuestName.setText(room.getGuestName()); txtRoomName.setText(room.getName() + " (" + room.getType() + ")");
             
@@ -246,11 +268,10 @@ public class GuestProfilePanel extends JPanel {
 
             txtBookInTime.setText(room.getBookedAt() != null ? sdf.format(room.getBookedAt()) : "N/A");
             txtBookOutTime.setText(room.getBookOutAt() != null ? sdf.format(room.getBookOutAt()) : "N/A");
-            txtDiscount.setText(String.valueOf(room.getDiscount())); // Load ang discount
+            txtDiscount.setText(String.valueOf(room.getDiscount())); 
             txtTotalAmount.setText("P " + String.format("%,.2f", room.getTotal()));
             btnUpdate.setEnabled(true); btnBookOut.setEnabled(true);
         } else {
-            // I-clear ang fields kung walay napili o wala naka-book
             if (room == null && !listModel.isEmpty()) {
                 guestList.setSelectedIndex(0);
                 if (guestList.getSelectedValue() != null) { isLoading = false; loadGuestData(guestList.getSelectedValue()); return; }
@@ -260,14 +281,12 @@ public class GuestProfilePanel extends JPanel {
         isLoading = false;
     }
 
-    // Method para sa pag-update sa options sa guest count depende sa klase sa kwarto
     private void updateGuestCountOptions(String type) {
         cbGuestCount.removeAllItems();
         int max = type.contains("VIP") ? 10 : type.contains("FAMILY") ? 7 : 2;
         for (int i = 1; i <= max; i++) cbGuestCount.addItem(i);
     }
 
-    // Method para sa awtomatiko nga pag-update sa book out date ug total amount
     private void updateBookOutDateAndTotal() {
         if (currentRoom == null || isLoading) return;
         Integer nights = (Integer) cbNights.getSelectedItem();
@@ -287,21 +306,18 @@ public class GuestProfilePanel extends JPanel {
         }
     }
 
-    // Method para sa pag-refresh sa listahan sa mga naka-book nga bisita
     public void refreshGuestList() {
         Room selected = guestList.getSelectedValue(); listModel.clear();
         for (Room r : hotelManager.getBookedRooms()) listModel.addElement(r);
         if (selected != null && "Booked".equals(selected.getStatus())) guestList.setSelectedValue(selected, true);
     }
 
-    // Method para sa paglimpyo sa tanang input fields
     private void clearFields() {
         txtGuestName.setText(""); txtRoomName.setText(""); 
         cbGuestCount.setSelectedIndex(-1); cbPaymentMethod.setSelectedIndex(-1); cbNights.setSelectedIndex(0);
         txtBookInTime.setText(""); txtBookOutTime.setText(""); txtTotalAmount.setText("");
     }
 
-    // Logic para sa pag-update sa guest profile data
     private void updateProfile() {
         if (currentRoom == null) return;
         try {
@@ -316,12 +332,10 @@ public class GuestProfilePanel extends JPanel {
             try { discount = Double.parseDouble(txtDiscount.getText().trim()); } catch (Exception ignored) {}
             currentRoom.setDiscount(discount);
             
-            // Re-calculate ang total payment
             double price = Double.parseDouble(currentRoom.getPrice());
             double total = (price * currentRoom.getNights()) + (price * currentRoom.getGuestCount()) - currentRoom.getDiscount();
             currentRoom.setTotal(total);
             
-            // I-update ang BookOut date
             java.util.Calendar cal = java.util.Calendar.getInstance();
             cal.setTime(currentRoom.getBookedAt());
             cal.add(java.util.Calendar.DAY_OF_MONTH, currentRoom.getNights());
@@ -332,12 +346,15 @@ public class GuestProfilePanel extends JPanel {
         } catch (Exception e) { JOptionPane.showMessageDialog(this, "Error updating profile: " + e.getMessage()); }
     }
 
-    // Logic para sa pag-book out sa kwarto
     private void bookOut() {
         if (currentRoom == null) return;
-        if (JOptionPane.showConfirmDialog(this, "Are you sure you gotta book this : " + currentRoom.getName() + "?", "Confirm Book Out", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-            hotelManager.bookOutRoom(currentRoom); system.roomUpdateTable(); formHandler.clearFields(); clearFields();
-            JOptionPane.showMessageDialog(this, "Room has been booked out successfully."); system.showRoomDetails();
+        if (JOptionPane.showConfirmDialog(this, "Sigurado ka nga i-book out kini nga kwarto: " + currentRoom.getName() + "?", "Confirm Book Out", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            hotelManager.bookOutRoom(currentRoom); 
+            system.roomUpdateTable(); 
+            formHandler.clearFields(); 
+            clearFields(); 
+            JOptionPane.showMessageDialog(this, "Malampuson nga na-book out ang kwarto.");
+            system.showRoomDetails(); 
         }
     }
 }

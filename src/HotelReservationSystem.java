@@ -272,20 +272,28 @@ public class HotelReservationSystem extends JFrame {
         model = new DefaultTableModel(columns, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; } // Dili pwede i-edit ang table cells
         };
+        
+        Font tableFont = new Font("Trade Gothic", Font.BOLD, 12);
+        if (tableFont.getFamily().equals("Dialog")) tableFont = new Font("Arial", Font.BOLD, 12);
+        
         table = new JTable(model);
         table.setRowHeight(25);
+        table.setFont(tableFont); // I-set ang table font to bold
         table.getTableHeader().setBackground(THEME_RED);
         table.getTableHeader().setForeground(THEME_YELLOW);
+        table.getTableHeader().setFont(tableFont.deriveFont(Font.BOLD, 13f)); // I-set ang header font to bold
         table.setSelectionBackground(Color.RED); // Pula ang color kung naay napili nga row
         table.setSelectionForeground(Color.WHITE);
         table.setGridColor(Color.RED);
 
         // Custom renderer para ma-center ang text ug ma-pula ang background sa pinili
+        final Font rendererFont = tableFont;
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer() {
             @Override public Component getTableCellRendererComponent(JTable t, Object v, boolean isS, boolean hasF, int r, int c) {
                 Component comp = super.getTableCellRendererComponent(t, v, isS, hasF, r, c);
                 comp.setBackground(isS ? Color.RED : LIGHT_YELLOW);
                 comp.setForeground(isS ? Color.WHITE : THEME_RED);
+                comp.setFont(rendererFont); // Siguradohon nga bold ang font sa cells
                 return comp;
             }
         };
@@ -341,7 +349,7 @@ public class HotelReservationSystem extends JFrame {
         cbRoomNo.addActionListener(e -> { Integer val = (Integer) cbRoomNo.getSelectedItem(); if (val != null) { Room r = hotelManager.findRoomByNo(val); if (r != null) formHandler.selectRoomInForm(r); } });
     }
 
-    // [Method Group: Logic & Auth]
+    // --- [Method Group: Logic & Auth] ---
 
     // I-update ang UI depende kung naay naka-login o wala
     public void updateAuthUI() {
@@ -377,7 +385,7 @@ public class HotelReservationSystem extends JFrame {
         } else System.exit(0);
     }
 
-    // [Method Group: Utilities] 
+    // --- [Method Group: Utilities] ---
 
     public void roomUpdateTable() { tableHandler.roomUpdateTable(); } // I-refresh ang data sa table
     public void showRoomDetails() { leftCardLayout.show(leftContent, "details"); } // I-show ang details form
