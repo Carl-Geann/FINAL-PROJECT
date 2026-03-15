@@ -10,7 +10,7 @@ import java.awt.Component;
  * Kini nagpakita sa mga detalye sa booking sama sa oras sa check-in/out, kwarto, ug bayad.
  */
 public class GuestProfilePanel extends JPanel {
-    // --- [1. UI Components para sa Inputs] ---
+    // UI Components para sa Inputs
     private JTextField txtGuestName, txtRoomName, txtBookInTime, txtBookOutTime, txtTotalAmount, txtDiscount;
     private JComboBox<Integer> cbGuestCount, cbNights;
     private JComboBox<String> cbPaymentMethod;
@@ -348,12 +348,12 @@ public class GuestProfilePanel extends JPanel {
 
     private void bookOut() {
         if (currentRoom == null) return;
-        if (JOptionPane.showConfirmDialog(this, "Sigurado ka nga i-book out kini nga kwarto: " + currentRoom.getName() + "?", "Confirm Book Out", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+        if (JOptionPane.showConfirmDialog(this, "Book out confirmed ? : " + currentRoom.getName() + "?", "Confirm Book Out", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
             hotelManager.bookOutRoom(currentRoom); 
             system.roomUpdateTable(); 
             formHandler.clearFields(); 
             clearFields(); 
-            JOptionPane.showMessageDialog(this, "Malampuson nga na-book out ang kwarto.");
+            JOptionPane.showMessageDialog(this, "Book out process completed !");
             system.showRoomDetails(); 
         }
     }

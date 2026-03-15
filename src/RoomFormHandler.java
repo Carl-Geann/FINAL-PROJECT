@@ -71,7 +71,7 @@ public class RoomFormHandler {
         system.updateActionButtons();
     }
 
-    // Kini nga method nagpuno sa form og data gikan sa napili nga Room object.
+    // Kini nga method nagpuno sa form og data gikan sa napili nga Room object
     public void selectRoomInForm(Room r) {
         currentSelected = r;
         cbCategory.setSelectedItem(r.getType());
@@ -105,7 +105,7 @@ public class RoomFormHandler {
         cbRoomNo.setSelectedIndex(-1);
     }
 
-    // Kini nga method naga-update sa guest count dropdown base sa kapasidad sa kategorya sa kwarto.
+    // Kini nga method naga-update sa guest count dropdown base sa kapasidad sa kategorya sa kwarto
     public void updateGuestCountOptions() {
         if (cbGuestCount == null || cbCategory == null) return;
         int maxGuests = 2;
@@ -124,9 +124,9 @@ public class RoomFormHandler {
         else cbGuestCount.setSelectedIndex(0);
     }
 
-    // --- [Method Group: Core Logic & Calculations] ---
+    // Calculations
 
-    // Kini nga method nagkalkula sa total nga bayad base sa presyo, gidaghanon sa gabii, ug mga discount.
+    // Kini nga method nagkalkula sa total nga bayad base sa presyo, gidaghanon sa gabii, ug mga discount
     public void calculateTotal() {
         try {
             double price = Double.parseDouble(txtPrice.getText().isEmpty() ? "0" : txtPrice.getText());
@@ -140,7 +140,7 @@ public class RoomFormHandler {
         }
     }
 
-    // Kini nga method awtomatiko nga naga-update sa gitagna nga check-out date base sa nights.
+    // Kini nga method awtomatiko nga naga-update sa gitagna nga check-out date base sa nights
     public void updateBookOutDate() {
         Date bookingAt = (Date) spBookingAt.getValue();
         Integer nights = (Integer) cbNights.getSelectedItem();
@@ -152,27 +152,27 @@ public class RoomFormHandler {
         }
     }
 
-    // --- [Method Group: Booking Operations] ---
+    //  Booking Operations
 
     // Kini nga method nag-proseso sa "Book In" nga request para sa napili nga kwarto.
     public void bookInRoom() {
         if (currentSelected == null) {
-            JOptionPane.showMessageDialog(system, "Palihog pagpili una og kwarto sa table.", "Walay Napili", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(system, "Kindly first choose what room you select !", "You picked none !", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         if (!"Free".equals(currentSelected.getStatus())) {
-            JOptionPane.showMessageDialog(system, "Kini nga kwarto booked na. Pagpili og 'Free' nga kwarto.", "Dili Pwede", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(system, "This room is occupied, please choose the free room ! ", "Access Denied !", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         String guestName = txtGuest.getText().trim();
         if (guestName.isEmpty()) {
-            JOptionPane.showMessageDialog(system, "Palihog butangi og Guest Name para maka-book.", "Guest Name Gikinahanglan", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(system, "Kindly put the name of the guest.", "Required Guest Name !", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        int ok = JOptionPane.showConfirmDialog(system, "I-book in ang bisita nga '" + guestName + "' sa kwarto " + currentSelected.getRoomNo() + "?", "Confirm Book In", JOptionPane.OK_CANCEL_OPTION);
+        int ok = JOptionPane.showConfirmDialog(system, "Will you booked '" + guestName + "' room in " + currentSelected.getRoomNo() + "?", "Confirm Book In", JOptionPane.OK_CANCEL_OPTION);
         if (ok != JOptionPane.OK_OPTION) return;
 
         String paymentMethod = cbPaymentMethod.getSelectedItem().toString();
@@ -194,7 +194,7 @@ public class RoomFormHandler {
         JOptionPane.showMessageDialog(system, "Malampuson nga na-book ang kwarto " + currentSelected.getRoomNo() + ".", "Book In Successful", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Kini nga method nag-proseso sa "Book Out" nga request, naglimpyo sa data sa bisita.
+    // Kini nga method nag-proseso sa "Book Out" nga request, naglimpyo sa data sa bisita
     public void bookOutRoom() {
         Room roomToBookOut = currentSelected;
         if (roomToBookOut == null) {
@@ -263,7 +263,7 @@ public class RoomFormHandler {
         clearFields();
     }
 
-    // [Method Group: Getters & Setters] 
+    // Getters & Setters
     public Room getCurrentSelected() { return currentSelected; }
     public void setCurrentSelected(Room r) { this.currentSelected = r; }
 }

@@ -349,7 +349,7 @@ public class HotelReservationSystem extends JFrame {
         cbRoomNo.addActionListener(e -> { Integer val = (Integer) cbRoomNo.getSelectedItem(); if (val != null) { Room r = hotelManager.findRoomByNo(val); if (r != null) formHandler.selectRoomInForm(r); } });
     }
 
-    // --- [Method Group: Logic & Auth] ---
+   
 
     // I-update ang UI depende kung naay naka-login o wala
     public void updateAuthUI() {
@@ -385,7 +385,7 @@ public class HotelReservationSystem extends JFrame {
         } else System.exit(0);
     }
 
-    // --- [Method Group: Utilities] ---
+    // Method Group: Utilities
 
     public void roomUpdateTable() { tableHandler.roomUpdateTable(); } // I-refresh ang data sa table
     public void showRoomDetails() { leftCardLayout.show(leftContent, "details"); } // I-show ang details form
@@ -399,7 +399,7 @@ public class HotelReservationSystem extends JFrame {
         return null;
     }
 
-    // Helper methods para sa paghimo og buttons nga naay styling
+    //  methods para sa paghimo og buttons nga naay styling
     private JButton createNavButton(String t, Font f, Color bg, Color fg, String p) {
         JButton b = new JButton(t); b.setFont(f); b.setBackground(bg); b.setForeground(fg);
         b.setFocusPainted(false); b.setBorder(BorderFactory.createLineBorder(fg, 1));
