@@ -385,7 +385,7 @@ public class HotelReservationSystem extends JFrame {
         } else System.exit(0);
     }
 
-    // Method Group: Utilities
+    
 
     public void roomUpdateTable() { tableHandler.roomUpdateTable(); } // I-refresh ang data sa table
     public void showRoomDetails() { leftCardLayout.show(leftContent, "details"); } // I-show ang details form
