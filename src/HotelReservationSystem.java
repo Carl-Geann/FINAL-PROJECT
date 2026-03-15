@@ -31,7 +31,7 @@ public class HotelReservationSystem extends JFrame {
     private GuestProfilePanel guestProfilePanel;
 
     // Buttons and Labels
-    private JButton btnSave, btnBookOut, btnBookIn;
+    private JButton btnBookOut, btnBookIn;
     private JLabel lblUser, lblTotalGuests;
     private JButton btnSignOut;
 
@@ -58,8 +58,8 @@ public class HotelReservationSystem extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Kini nga code nag-set sa icon sa window.
-        ImageIcon windowIcon = getScaledIcon("logo.png", 64, 64);
+        // Kini nga code nag-set sa icon sa window title bar
+        ImageIcon windowIcon = getScaledIcon("logo.png", 48, 48);
         if (windowIcon != null) {
             setIconImage(windowIcon.getImage());
         }
@@ -84,11 +84,11 @@ public class HotelReservationSystem extends JFrame {
         Font headerFont = new Font("Trade Gothic", Font.BOLD, 15);
         if (headerFont.getFamily().equals("Dialog")) headerFont = new Font("Arial", Font.BOLD, 15);
 
-        Color themeRed = new Color(150, 0, 0); // Maroon/Deep Red
-        Color themeYellow = new Color(255, 255, 100); // Yellow
-        Color lightYellow = new Color(255, 255, 240); // Pale Yellow/Cream
+        Color themeRed = new Color(150, 0, 0); // Maroon/Deep Red nga theme
+        Color themeYellow = new Color(255, 255, 100); // Dalag nga color
+        Color lightYellow = new Color(255, 255, 240); // Mas hayag nga dalag para sa fields
 
-        // Kini nga code nag-set up sa Room Details Form panel
+        // Kini nga code nag-set up sa Room Details Form panel (Ang form sa wala)
         detailsPanel = new JPanel(new BorderLayout(0, 5));
         detailsPanel.setBackground(themeRed);
 
@@ -99,26 +99,32 @@ public class HotelReservationSystem extends JFrame {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Kini nga code nag-initialize sa mga input field sa form
+        // Kini nga code nag-initialize sa mga input field sa form (Combo boxes ug Text fields)
         cbRoomNo = new JComboBox<>();
+        cbRoomNo.setUI(new javax.swing.plaf.basic.BasicComboBoxUI()); // I-flat ang hitsura sa combo box
         txtName = new JTextField();
         txtName.setEditable(false);
         txtPrice = new JTextField();
         txtPrice.setEditable(false);
         txtGuest = new JTextField();
         cbNights = new JComboBox<>();
+        cbNights.setUI(new javax.swing.plaf.basic.BasicComboBoxUI());
         for (int i = 1; i <= 7; i++) {
-            cbNights.addItem(i);
+            cbNights.addItem(i); // Idugang ang options sa nights (1-7)
         }
         txtDiscount = new JTextField("0");
         txtTotalPayment = new JTextField();
         txtTotalPayment.setEditable(false);
         cbGuestCount = new JComboBox<>();
+        cbGuestCount.setUI(new javax.swing.plaf.basic.BasicComboBoxUI());
         cbCategory = new JComboBox<>(new String[]{"VIP BED", "FAMILY BED", "COUPLE BED"});
+        cbCategory.setUI(new javax.swing.plaf.basic.BasicComboBoxUI());
         cbStatus = new JComboBox<>(new String[]{"Free", "Booked"});
+        cbStatus.setUI(new javax.swing.plaf.basic.BasicComboBoxUI());
         cbPaymentMethod = new JComboBox<>(new String[]{"Credit Card", "Debit Card", "Cash", "Online Transfer"});
+        cbPaymentMethod.setUI(new javax.swing.plaf.basic.BasicComboBoxUI());
 
-        // Kini nga code nag-set up sa mga date spinner para sa mga oras sa booking.
+        // Kini nga code nag-set up sa mga date spinner para sa booking ug book out dates
         spBookingAt = new JSpinner(new SpinnerDateModel(new Date(), null, null, java.util.Calendar.MINUTE));
         spBookingAt.setEditor(new JSpinner.DateEditor(spBookingAt, "yyyy-MM-dd HH:mm"));
         ((JSpinner.DefaultEditor) spBookingAt.getEditor()).getTextField().setEditable(false);
@@ -134,7 +140,7 @@ public class HotelReservationSystem extends JFrame {
                 cbRoomNo, cbNights, cbGuestCount, txtName, txtPrice, txtGuest, txtDiscount,
                 txtTotalPayment, cbCategory, cbStatus, cbPaymentMethod, spBookingAt, spBookOutAt);
 
-        formHandler.updateGuestCountOptions();
+        formHandler.updateGuestCountOptions(); // I-update ang options sa guest count depende sa category
 
         // Kini nga code nag-initialize sa guest profile panel.
         guestProfilePanel = new GuestProfilePanel(this, hotelManager, formHandler);
@@ -144,30 +150,37 @@ public class HotelReservationSystem extends JFrame {
         String[] iconPaths = {"room no.png", "room.png", "category.png", "guest list.png", "status.png", "occupied.png", "total payment.png", "payment method.png", "discount.png", "book_in.png", "total payment.png", "book_in.png", "book out.png"};
         JComponent[] fields = {cbRoomNo, txtName, cbCategory, txtGuest, cbStatus, cbGuestCount, txtPrice, cbPaymentMethod, txtDiscount, cbNights, txtTotalPayment, spBookingAt, spBookOutAt};
 
+        // Kini nga loop nag-style sa tanang input fields
         for (JComponent field : fields) {
             field.setFont(fieldFont);
             field.setBackground(lightYellow);
             field.setForeground(themeRed);
+            field.setBorder(BorderFactory.createLineBorder(Color.RED, 2)); // Pula nga border sa tanang grids
+            addFocusEffect(field, themeRed);
             if (field instanceof JComboBox) {
-                ((JComboBox<?>) field).setFocusable(false);
+                ((JComboBox<?>) field).setFocusable(true); 
             }
         }
 
-        // Kini nga code nag-style sa mga spinner field.
+        // Kini nga code nag-style sa mga spinner text fields
         JTextField spField1 = ((JSpinner.DefaultEditor) spBookingAt.getEditor()).getTextField();
         spField1.setFont(fieldFont);
         spField1.setBackground(lightYellow);
         spField1.setForeground(themeRed);
+        spField1.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+        addFocusEffect(spField1, themeRed);
 
         JTextField spField2 = ((JSpinner.DefaultEditor) spBookOutAt.getEditor()).getTextField();
         spField2.setFont(fieldFont);
         spField2.setBackground(lightYellow);
         spField2.setForeground(themeRed);
+        spField2.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+        addFocusEffect(spField2, themeRed);
 
         // Kini nga code nagdugang og mga listener para sa awtomatiko nga pagkalkula sa total.
         java.awt.event.KeyAdapter calcKeyListener = new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent e) {
-                formHandler.calculateTotal();
+                formHandler.calculateTotal(); // Kalkulahon ang total inig type sa user
             }
         };
         java.awt.event.ActionListener calcActionListener = e -> formHandler.calculateTotal();
@@ -175,14 +188,14 @@ public class HotelReservationSystem extends JFrame {
         txtPrice.addKeyListener(calcKeyListener);
         cbNights.addActionListener(e -> {
             formHandler.calculateTotal();
-            formHandler.updateBookOutDate();
+            formHandler.updateBookOutDate(); // I-update ang book out date base sa nights
         });
         txtDiscount.addKeyListener(calcKeyListener);
         cbGuestCount.addActionListener(calcActionListener);
 
         spBookingAt.addChangeListener(e -> formHandler.updateBookOutDate());
 
-        // Kini nga code nagdugang og mga label ug field sa GridBagLayout
+        // Kini nga code nagdugang og mga label ug field sa GridBagLayout sa form
         for (int i = 0; i < labels.length; i++) {
             gbc.gridx = 0;
             gbc.gridy = i;
@@ -191,7 +204,7 @@ public class HotelReservationSystem extends JFrame {
             label.setFont(labelFont);
             label.setForeground(themeYellow);
             
-            // Add Icon to Label
+            // Idugang ang Icon sa Label
             ImageIcon icon = getScaledIcon(iconPaths[i], 20, 20);
             if (icon != null) {
                 label.setIcon(icon);
@@ -206,24 +219,36 @@ public class HotelReservationSystem extends JFrame {
             formPanel.add(fields[i], gbc);
         }
 
-        // Kini nga code naghimo sa mga action button (Save/Book In/Book Out)
-        actionsPanel = new JPanel(new GridLayout(1, 3, 10, 0));
+        // Kini nga code nag-himo sa mga action button (Book In/Book Out)
+        actionsPanel = new JPanel(new GridLayout(1, 2, 10, 0));
         actionsPanel.setBackground(themeRed);
-        btnSave = createActionButton("Save", tradeGothicBold, themeYellow, themeRed, "update.png");
         btnBookIn = createActionButton("Book In", tradeGothicBold, themeYellow, themeRed, "book_in.png");
         btnBookOut = createActionButton("Book Out", tradeGothicBold, themeYellow, themeRed, "book out.png");
 
-        actionsPanel.add(btnSave);
+        // Idugang ang hover effect sa mga buttons
+        JButton[] actionBtns = {btnBookIn, btnBookOut};
+        for (JButton btn : actionBtns) {
+            btn.addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mouseEntered(java.awt.event.MouseEvent e) {
+                    btn.setBackground(Color.WHITE); // Puti inig hover
+                    btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                }
+                public void mouseExited(java.awt.event.MouseEvent e) {
+                    btn.setBackground(themeYellow); // Balik sa yellow
+                }
+            });
+        }
+
         actionsPanel.add(btnBookIn);
         actionsPanel.add(btnBookOut);
         actionsPanel.setPreferredSize(new Dimension(500, 45));
 
-        // Kini nga code nag-set up sa panel sa wala nga bahin
+        // Kini nga code nag-set up sa panel sa wala nga bahin (Side Panel)
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.setBackground(themeRed);
         leftPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         
-        // Kini nga code nag-initialize sa header panel nga adunay navigation button
+        // Kini nga code nag-initialize sa header panel nga adunay navigation buttons
         headerPanel = new JPanel(new GridLayout(1, 2, 10, 0));
         headerPanel.setBackground(themeRed);
         headerPanel.setPreferredSize(new Dimension(500, 45));
@@ -233,6 +258,7 @@ public class HotelReservationSystem extends JFrame {
         headerPanel.add(btnRoomDetails);
         headerPanel.add(btnGuestProfile);
 
+        // CardLayout para sa pag-switch switch sa Room Details ug Guest Profile
         leftCardLayout = new CardLayout();
         leftContent = new JPanel(leftCardLayout);
         leftContent.setBackground(themeRed);
@@ -243,7 +269,7 @@ public class HotelReservationSystem extends JFrame {
         leftPanel.add(headerPanel, BorderLayout.NORTH);
         leftPanel.add(leftContent, BorderLayout.CENTER);
 
-        // Kini nga code nagdugang og scrolling sa form panel
+        // Kini nga code nagdugang og scrolling sa form panel aron ma-scroll kung daghan ang fields
         JScrollPane formScroll = new JScrollPane(formPanel);
         formScroll.setBackground(themeRed);
         formScroll.getViewport().setBackground(themeRed);
@@ -270,8 +296,10 @@ public class HotelReservationSystem extends JFrame {
         txtSearch.setFont(fieldFont);
         txtSearch.setBackground(Color.WHITE);
         txtSearch.setForeground(themeRed);
+        txtSearch.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+        addFocusEffect(txtSearch, themeRed);
         
-        // Kini nga code naga-refresh sa table samtang nag-type ang user sa search field
+        // Kini nga code naga-refresh sa table samtang nag-type ang user sa search field (Real-time search)
         txtSearch.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             @Override
             public void insertUpdate(javax.swing.event.DocumentEvent e) { tableHandler.searchRooms(); }
@@ -281,6 +309,7 @@ public class HotelReservationSystem extends JFrame {
             public void changedUpdate(javax.swing.event.DocumentEvent e) { tableHandler.searchRooms(); }
         });
 
+        // Filter buttons para sa pag-filter sa mga kwarto
         JButton btnShowAll = createFilterButton("Show All", tradeGothicBold, themeRed, themeYellow, 120, "showall.png");
         btnShowAll.addActionListener(e -> tableHandler.showRoomsByStatus(null));
 
@@ -304,12 +333,12 @@ public class HotelReservationSystem extends JFrame {
         lblTotalGuests.setForeground(themeRed);
         filterPanel.add(lblTotalGuests);
 
-        // Kini nga code nag-initialize sa main room table
+        // Kini nga code nag-initialize sa main room table diin makita ang listahan sa mga kwarto
         String[] columns = {"Room No", "Room Name", "Status", "Type", "Guest Name", "Price", "Nights", "Discount", "Total", "Guests In", "Payment Method"};
         model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;
+                return false; // Dili pwede i-edit ang cells direkta sa table
             }
         };
         table = new JTable(model);
@@ -320,23 +349,40 @@ public class HotelReservationSystem extends JFrame {
         table.setFont(tradeGothicBold);
         table.setBackground(lightYellow);
         table.setForeground(themeRed);
-        table.setSelectionBackground(themeRed);
-        table.setSelectionForeground(themeYellow);
+        table.setSelectionBackground(Color.RED); // Pula nga background inig click sa row
+        table.setSelectionForeground(Color.WHITE);
         table.setShowGrid(true);
-        table.setGridColor(themeRed);
-
-        // Kini nga code nag-sentro sa teksto sa mga cell sa table
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        table.setGridColor(Color.RED);
+        table.setFocusable(false); 
+        
+        // Kini nga code nag-style sa mga cells sa table para ma-sentro ang text
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (isSelected) {
+                    c.setBackground(Color.RED);
+                    c.setForeground(Color.WHITE);
+                } else {
+                    c.setBackground(lightYellow);
+                    c.setForeground(themeRed);
+                }
+                if (c instanceof JComponent) {
+                    ((JComponent) c).setBorder(null); 
+                }
+                return c;
+            }
+        };
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         for (int i = 0; i < table.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
 
-        // Kini nga code nag-sentro sa teksto sa header sa table
+        // Kini nga code nag-sentro sa text sa header sa table
         DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
         headerRenderer.setHorizontalAlignment(JLabel.CENTER);
 
-        // Kini nga code nag-adjust sa mga gilapdon sa kolum para sa main room table.
+        // I-set ang gilapdon sa mga columns sa table
         table.getColumnModel().getColumn(0).setPreferredWidth(80); // Room No
         table.getColumnModel().getColumn(1).setPreferredWidth(100); // Room Name
         table.getColumnModel().getColumn(2).setPreferredWidth(70); // Status
@@ -357,15 +403,15 @@ public class HotelReservationSystem extends JFrame {
         // Kini nga code nag-initialize sa table handler para sa pagdumala sa data sa table
         tableHandler = new RoomTableHandler(this, hotelManager, table, model, lblTotalGuests, txtSearch);
 
-        // Kini nga code nag-combine sa mga panel gamit ang split pane
+        // Gamit ang JSplitPane para ma-adjust ang gidak-on sa wala ug tuo nga panel
         mainSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
-        mainSplit.setDividerLocation(500); // Increased from 450 for better full-screen balance
+        mainSplit.setDividerLocation(500); 
         mainSplit.setDividerSize(5);
         mainSplit.setContinuousLayout(true);
         mainSplit.setBorder(null);
         add(mainSplit, BorderLayout.CENTER);
 
-        // Kini nga code nagdugang og mga navigation action listener
+        // Listeners para sa navigation buttons
         btnRoomDetails.addActionListener(e -> {
             leftCardLayout.show(leftContent, "details");
             updateActionButtons();
@@ -377,16 +423,15 @@ public class HotelReservationSystem extends JFrame {
             leftCardLayout.show(leftContent, "guestProfile");
         });
 
-        // Kini nga code nagdugang og mga action listener sa mga button.
-        btnSave.addActionListener(e -> formHandler.saveRoom());
+        // Action listeners para sa Book In ug Book Out buttons
         btnBookIn.addActionListener(e -> formHandler.bookInRoom());
         btnBookOut.addActionListener(e -> formHandler.bookOutRoom());
         btnRefresh.addActionListener(e -> {
             txtSearch.setText("");
-            tableHandler.roomUpdateTable(); // This resets the status filter and shows all
+            tableHandler.roomUpdateTable(); 
         });
 
-        // Kini nga code nagdugang og table selection listener para mapuno ang form.
+        // Selection listener para mapuno ang form inig click sa table row
         table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && table.getSelectedRow() != -1) {
                 try {
@@ -402,7 +447,7 @@ public class HotelReservationSystem extends JFrame {
             }
         });
 
-        // Kini nga code nag-handle sa pagbag-o sa status ug nag-set sa karon nga oras para sa booking
+        // Logic para sa status change
         cbStatus.addActionListener(e -> {
             boolean booked = "Booked".equals(cbStatus.getSelectedItem().toString());
             if (booked) {
@@ -411,13 +456,13 @@ public class HotelReservationSystem extends JFrame {
             }
         });
 
-        // Kini nga code naga-update sa mga option kung naay mausab sa kategorya
+        // Logic inig usab sa category
         cbCategory.addActionListener(e -> {
             formHandler.updateRoomNoOptions();
             formHandler.updateGuestCountOptions();
         });
 
-        // Kini nga code nagpili og kwarto kung mapili ang numero sa kwarto
+        // Logic inig pili sa room number
         cbRoomNo.addActionListener(e -> {
             Integer val = (Integer) cbRoomNo.getSelectedItem();
             if (val != null) {
@@ -428,7 +473,7 @@ public class HotelReservationSystem extends JFrame {
             }
         });
 
-        // Kini nga code nag-set up sa footer panel uban ang info sa user ug sign out
+        // Footer panel diin makita ang Signed In user ug Sign Out button
         JPanel footer = new JPanel(new BorderLayout());
         footer.setBackground(themeRed);
         footer.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
@@ -451,12 +496,12 @@ public class HotelReservationSystem extends JFrame {
             btnSignOut.setIconTextGap(10);
         }
         
-        btnSignOut.addActionListener(e -> signOut());
+        btnSignOut.addActionListener(e -> signOut()); // Sign out logic
         footer.add(lblUser, BorderLayout.WEST);
         footer.add(btnSignOut, BorderLayout.EAST);
         add(footer, BorderLayout.SOUTH);
 
-        // Kini nga code nag-initialize sa UI 
+        // I-initialize ang UI sa pagsugod
         formHandler.updateRoomNoOptions();
         roomUpdateTable();
         updateAuthUI();
@@ -474,7 +519,7 @@ public class HotelReservationSystem extends JFrame {
         authManager.setSignedIn(v);
     }
 
-    // Kini nga method nag-set sa email sa user karon
+    // Kini nga method nag-set sa username sa user karon
     public void setCurrentUser(String u) {
         authManager.setCurrentUser(u);
     }
@@ -484,7 +529,7 @@ public class HotelReservationSystem extends JFrame {
         return authManager.getUsers();
     }
 
-    // Kini nga method naga-update sa UI base sa kung ang user naka-sign in ba
+    // Kini nga method naga-update sa UI base sa status sa login
     public void updateAuthUI() {
         boolean enabled = authManager.isSignedIn();
         cbRoomNo.setEnabled(enabled);
@@ -497,7 +542,6 @@ public class HotelReservationSystem extends JFrame {
         cbCategory.setEnabled(enabled);
         cbStatus.setEnabled(enabled);
         cbPaymentMethod.setEnabled(enabled);
-        btnSave.setEnabled(enabled);
         btnBookIn.setEnabled(enabled);
         btnBookOut.setEnabled(enabled);
         lblUser.setText(enabled ? ("Signed in as " + authManager.getCurrentUser()) : "Signed out");
@@ -506,14 +550,11 @@ public class HotelReservationSystem extends JFrame {
         
     }
 
-    // Kini nga method naga-update sa text ug state sa mga action button base sa pagpili
+    // Kini nga method naga-update sa state sa mga action buttons
     public void updateActionButtons() {
         boolean signedIn = authManager.isSignedIn();
         Room currentSelected = formHandler.getCurrentSelected();
         boolean selected = currentSelected != null;
-        btnSave.setText(selected ? "Update" : "Save");
-
-        btnSave.setEnabled(signedIn);
 
         if (selected) {
             boolean isBooked = "Booked".equals(currentSelected.getStatus());
@@ -527,22 +568,22 @@ public class HotelReservationSystem extends JFrame {
         }
     }
 
-    // Kini nga method naga-refresh sa main room table
+    // Kini nga method naga-refresh sa table data
     public void roomUpdateTable() {
         tableHandler.roomUpdateTable();
     }
 
-    // Kini nga method naglimpyo sa gipili sa main table
+    // Kini nga method naglimpyo sa gipili sa table
     public void clearTableSelection() {
         table.clearSelection();
     }
 
-    // Kini nga method nag-switch sa UI ngadto sa Room Details view
+    // Kini nga method nag-switch ngadto sa Room Details view
     public void showRoomDetails() {
         leftCardLayout.show(leftContent, "details");
     }
 
-    // Kini nga method nag-handle sa proseso sa pag-sign out
+    // Kini nga method nag-handle sa pag-sign out
     private void signOut() {
         authManager.setSignedIn(false);
         authManager.setCurrentUser(null);
@@ -558,14 +599,14 @@ public class HotelReservationSystem extends JFrame {
             setSignedIn(true);
             setCurrentUser(login.getLoggedInUser());
             updateAuthUI();
-            roomUpdateTable(); // Refresh the table after re-login
+            roomUpdateTable(); 
             setVisible(true);
         } else {
             System.exit(0);
         }
     }
 
-    // Helper methods for UI Construction to clean up constructor
+    // Method para sa pag-load ug pag-scale sa mga icons
     private ImageIcon getScaledIcon(String path, int width, int height) {
         try {
             java.net.URL imgURL = getClass().getResource("/pic/" + path);
@@ -580,6 +621,7 @@ public class HotelReservationSystem extends JFrame {
         return null;
     }
 
+    // Method para sa pag-create og navigation buttons
     private JButton createNavButton(String text, Font font, Color bg, Color fg, String iconPath) {
         JButton btn = new JButton(text);
         btn.setFont(font);
@@ -597,6 +639,7 @@ public class HotelReservationSystem extends JFrame {
         return btn;
     }
 
+    // Method para sa pag-create og action buttons
     private JButton createActionButton(String text, Font font, Color bg, Color fg, String iconPath) {
         JButton btn = new JButton(text);
         btn.setFont(font);
@@ -614,6 +657,7 @@ public class HotelReservationSystem extends JFrame {
         return btn;
     }
 
+    // Method para sa pag-create og filter buttons
     private JButton createFilterButton(String text, Font font, Color bg, Color fg, int width, String iconPath) {
         JButton btn = new JButton(text);
         btn.setPreferredSize(new Dimension(width, 35));
@@ -628,6 +672,44 @@ public class HotelReservationSystem extends JFrame {
         }
         
         return btn;
+    }
+
+    // Kini nga method nagdugang og visual effect inig click o hover sa mga input fields
+    private void addFocusEffect(JComponent c, Color defaultColor) {
+        c.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                c.setBorder(BorderFactory.createLineBorder(Color.RED, 2)); // Pula nga border inig focus
+            }
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                c.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+            }
+        });
+        
+        // Siguroon nga walay blue selection color sa ComboBox
+        if (c instanceof JComboBox) {
+            JComboBox<?> cb = (JComboBox<?>) c;
+            cb.setFocusable(true);
+            cb.setRequestFocusEnabled(true);
+            UIManager.put("ComboBox.selectionBackground", Color.RED);
+            UIManager.put("ComboBox.selectionForeground", Color.WHITE);
+        }
+
+        c.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                if (!c.isFocusOwner()) {
+                    c.setBorder(BorderFactory.createLineBorder(Color.RED, 2)); // Pula nga border inig hover
+                }
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                if (!c.isFocusOwner()) {
+                    c.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                }
+            }
+        });
     }
 
 }

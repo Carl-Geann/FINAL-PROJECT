@@ -10,12 +10,13 @@ import java.text.ParseException;
  */
 public class RoomFormHandler {
 
-    // References to UI components in the form
+    // Kini nga mga components kay ang mga input field sa Room Details form
     private JComboBox<Integer> cbRoomNo, cbNights, cbGuestCount;
     private JTextField txtName, txtPrice, txtGuest, txtDiscount, txtTotalPayment;
     private JComboBox<String> cbCategory, cbStatus, cbPaymentMethod;
     private JSpinner spBookingAt, spBookOutAt;
 
+    // Kini ang mga reference sa logic managers ug sa main system
     private HotelManager hotelManager;
     private Room currentSelected;
     private HotelReservationSystem system;
@@ -25,7 +26,7 @@ public class RoomFormHandler {
             JTextField txtName, JTextField txtPrice, JTextField txtGuest, JTextField txtDiscount,
             JTextField txtTotalPayment, JComboBox<String> cbCategory, JComboBox<String> cbStatus,
             JComboBox<String> cbPaymentMethod, JSpinner spBookingAt, JSpinner spBookOutAt) {
-        // Initializing references
+        // I-initialize ang mga references
         this.system = system;
         this.hotelManager = hotelManager;
         this.cbRoomNo = cbRoomNo;
@@ -284,7 +285,7 @@ public class RoomFormHandler {
         }
     }
 
-    // This method processes a "Book Out" request, clearing guest data and freeing the room
+    // Kini nga method nag-proseso sa "Book Out" nga request, naglimpyo sa data sa bisita ug naghimo sa kwarto nga "Free".
     public void bookOutRoom() {
         Room roomToBookOut = currentSelected;
         if (roomToBookOut == null) {
@@ -320,12 +321,12 @@ public class RoomFormHandler {
         JOptionPane.showMessageDialog(system, "Room " + roomToBookOut.getRoomNo() + " has been successfully booked out.", "Book Out Successful", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // This method returns the currently selected room object
+    // Kini nga method nag-return sa napili nga Room object karon.
     public Room getCurrentSelected() {
         return currentSelected;
     }
 
-    // This method manually sets the current selected room
+    // Kini nga method nag-set sa napili nga Room object karon.
     public void setCurrentSelected(Room r) {
         this.currentSelected = r;
     }

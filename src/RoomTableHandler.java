@@ -3,13 +3,13 @@ import javax.swing.table.DefaultTableModel;
 import java.util.stream.Collectors;
 
 /**
- * Kini nga class nga RoomTableHandler kay para sa pagdumala sa JTable UI display
- * Kini ang nag-handle sa pag-update sa main room table gamit ang data gikan sa HotelManager
+ * Kini nga class nga RoomTableHandler kay para sa pagdumala sa JTable UI display.
+ * Kini ang nag-handle sa pag-update sa main room table gamit ang data gikan sa HotelManager.
  */
 public class RoomTableHandler {
     // Mga model reference para sa main room table.
     private DefaultTableModel model;
-    // UI Label para ipakita ang kinatibuk-ang gidaghanon sa mga bisita nga anaa karon sa hotel
+    // UI Label para ipakita ang kinatibuk-ang gidaghanon sa mga bisita nga anaa karon sa hotel.
     private JLabel lblTotalGuests;
     // Search field para sa main room table.
     private JTextField txtSearch;
@@ -22,25 +22,25 @@ public class RoomTableHandler {
                             JTable table, DefaultTableModel model, 
                             JLabel lblTotalGuests,
                             JTextField txtSearch) {
-        // Initializing references
+        // Pag-initialize sa mga references
         this.hotelManager = hotelManager;
         this.model = model;
         this.lblTotalGuests = lblTotalGuests;
         this.txtSearch = txtSearch;
     }
 
-    // Kini nga method nag-apply sa search filter sa main room table ug naga-update sa gidaghanon sa mga bisita
+    // Kini nga method nag-apply sa search filter sa main room table ug naga-update sa gidaghanon sa mga bisita.
     public void searchRooms() {
         showRoomsByStatus(currentStatusFilter);
     }
 
-    // Kini nga method naga-filter sa mga kwarto base sa ilang status (Free o Booked)
+    // Kini nga method naga-filter sa mga kwarto base sa ilang status (Free o Booked).
     public void showRoomsByStatus(String statusFilter) {
         this.currentStatusFilter = statusFilter;
         String query = txtSearch.getText().toLowerCase().trim();
         model.setRowCount(0);
         
-        // Calculate global total guests regardless of filter
+        // Pagkalkula sa kinatibuk-ang mga bisita bisan unsa pa ang filter
         int globalTotalGuests = 0;
         for (Room r : hotelManager.getAllRooms()) {
             if ("Booked".equals(r.getStatus())) {
@@ -49,10 +49,10 @@ public class RoomTableHandler {
         }
 
         java.util.List<Room> filteredList = hotelManager.getAllRooms().stream().filter(room -> {
-            // Apply status filter if set
+            // Pag-apply sa status filter kung gi-set
             boolean matchesStatus = (statusFilter == null) || statusFilter.equals(room.getStatus());
             
-            // Apply search query if set
+            // Pag-apply sa search query kung gi-set
             boolean matchesQuery = query.isEmpty();
             if (!matchesQuery) {
                 boolean matchesRoomNo = String.valueOf(room.getRoomNo()).contains(query);
@@ -93,7 +93,7 @@ public class RoomTableHandler {
         lblTotalGuests.setText(" | Total Guests In: " + globalTotalGuests);
     }
 
-    // Kini nga method naga-update sa main room table uban ang kompleto nga listahan sa storage sa data
+    // Kini nga method naga-update sa main room table uban ang kompleto nga listahan sa inventory.
     public void roomUpdateTable() {
         showRoomsByStatus(null);
     }

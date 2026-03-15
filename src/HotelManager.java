@@ -8,50 +8,50 @@ import java.util.stream.Collectors;
  * Kini ang nag-handle sa pagdugang, pag-update, pag-book, ug pag-filter sa mga kwarto sa hotel.
  */
 public class HotelManager {
-    // Kini nga listahan nagtipig sa tanang mga kwarto nga anaa karon sa inventory sa hotel.
+    // Kini nga listahan nagtipig sa tanang mga kwarto nga anaa karon sa inventory sa hotel
     private ArrayList<Room> rooms;
 
     public HotelManager() {
         this.rooms = new ArrayList<>();
-        // Nagbutang sa inisyal nga set sa mga kwarto sa dihang gihimo ang manager.
+        // Nagbutang sa inisyal nga set sa mga kwarto sa dihang gihimo ang manager
         seedInventory();
     }
 
-    // Kini nga method nag-return sa kompleto nga listahan sa mga kwarto.
+    // Kini nga method nag-return sa kompleto nga listahan sa mga kwarto
     public List<Room> getAllRooms() {
         return rooms;
     }
 
-    // Kini nga method nag-return lamang sa mga kwarto nga gi-book karon sa mga bisita.
+    // Kini nga method nag-return lamang sa mga kwarto nga gi-book karon sa mga bisita
     public List<Room> getBookedRooms() {
         return rooms.stream()
                 .filter(r -> "Booked".equals(r.getStatus()) && r.getGuestName() != null && !r.getGuestName().trim().isEmpty())
                 .collect(Collectors.toList());
     }
 
-    // Kini nga method nangita og piho nga kwarto gamit ang iyang talagsaon nga numero sa kwarto.
+    // Kini nga method nangita og room no nga kwarto gamit ang iyang talagsaon nga numero sa kwarto
     public Room findRoomByNo(int roomNo) {
         return rooms.stream().filter(r -> r.getRoomNo() == roomNo).findFirst().orElse(null);
     }
 
-    // Kini nga method nangita og kwarto pinaagi sa iyang deskriptibong ngalan.
+    // Kini nga method nangita og kwarto pinaagi sa iyang deskriptibong ngalan
     public Room findRoomByName(String name) {
         return rooms.stream().filter(r -> r.getName().equals(name)).findFirst().orElse(null);
     }
 
-    // Kini nga method nag-generate sa sunod nga anaa nga numero sa kwarto.
+    // Kini nga method nag-generate sa sunod nga anaa nga numero sa kwarto
     private int nextRoomNo() {
         return rooms.stream().mapToInt(Room::getRoomNo).max().orElse(0) + 1;
     }
 
-    // Kini nga method nagpuno sa inisyal nga inventory sa mga kwarto para sa lain-laing mga kategorya.
+    // Kini nga method nagpuno sa inisyal nga inventory sa mga kwarto para sa lain-laing mga kategorya
     private void seedInventory() {
         seedType("VIP BED", "VIP", 20, "100");
         seedType("FAMILY BED", "Family", 20, "80");
         seedType("COUPLE BED", "Couple", 20, "60");
     }
 
-    // Kini nga method helper naghimo og daghang mga kwarto sa usa ka piho nga klase.
+    // Kini nga method helper naghimo og daghang mga kwarto sa usa ka piho nga klase
     private void seedType(String type, String base, int count, String price) {
         for (int i = 1; i <= count; i++) {
             String name = base + " " + i;
@@ -81,7 +81,7 @@ public class HotelManager {
         }
     }
 
-    // Kini nga method nagdugang og bag-ong kwarto sa sistema nga adunay kompleto nga mga detalye.
+    // Kini nga method nagdugang og bag-ong kwarto sa sistema nga adunay kompleto nga mga detalye
     public void addRoom(int roomNo, String name, String type, String status, String price, 
                         String paymentMethod, String guestName, Date bookedAt, Date bookOutAt, 
                         int nights, double discount, double total, int guestCount) {
@@ -95,7 +95,7 @@ public class HotelManager {
         rooms.add(room);
     }
 
-    // Kini nga method nag-proseso sa aksyon nga "Book In" para sa usa ka bisita.
+    // Kini nga method nag-proseso sa aksyon nga "Book In" para sa usa ka bisita
     public void bookInRoom(Room room, String guestName, String paymentMethod, int nights, 
                            int guestCount, double discount, Date bookedAt, double total) {
         room.setStatus("Booked");
@@ -106,7 +106,7 @@ public class HotelManager {
         room.setDiscount(discount);
         room.setBookedAt(bookedAt);
         
-        // Awtomatiko nga kalkulasyon sa book out date base sa bookedAt ug nights.
+        // Awtomatiko nga kalkulasyon sa book out date base sa bookedAt ug nights
         if (bookedAt != null) {
             java.util.Calendar cal = java.util.Calendar.getInstance();
             cal.setTime(bookedAt);
@@ -170,7 +170,7 @@ public class HotelManager {
         return roomNo - r[0] + 1;
     }
 
-    // Kini nga method nag-filter sa listahan sa mga kwarto base sa query string sa tanang mga field.
+    // Kini nga method nag-filter sa listahan sa mga kwarto base sa query string sa tanang mga field
     public List<Room> searchRooms(String query) {
         if (query == null || query.trim().isEmpty()) {
             return getAllRooms();
