@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Kini nga class nga HotelManager kay para sa pagdumala sa koleksyon sa mga kwarto ug business logic.
- * Kini ang nag-handle sa pagdugang, pag-update, pag-book, ug pag-filter sa mga kwarto sa hotel.
+ * Kini nga class nga HotelManager kay para sa pagdumala sa koleksyon sa mga kwarto ug business logic
+ * Kini ang nag-handle sa pagdugang, pag-update, pag-book, ug pag-filter sa mga kwarto sa hotel
  */
 public class HotelManager {
     // Kini nga listahan nagtipig sa tanang mga kwarto nga anaa karon sa inventory sa hotel
@@ -29,7 +29,7 @@ public class HotelManager {
                 .collect(Collectors.toList());
     }
 
-    // Kini nga method nangita og room no nga kwarto gamit ang iyang talagsaon nga numero sa kwarto
+    // Kini nga method nangita og piho nga kwarto gamit ang iyang talagsaon nga numero sa kwarto
     public Room findRoomByNo(int roomNo) {
         return rooms.stream().filter(r -> r.getRoomNo() == roomNo).findFirst().orElse(null);
     }
@@ -61,7 +61,7 @@ public class HotelManager {
         }
     }
 
-    // Kini nga method naga-update sa mga detalye sa usa ka anaa na nga kwarto.
+    // Kini nga method naga-update sa mga detalye sa usa ka anaa na nga kwarto
     public void updateRoom(Room target, String name, String type, String status, String price, 
                            String paymentMethod, String guestName, Date bookedAt, Date bookOutAt, 
                            int nights, double discount, double total, int guestCount) {
@@ -119,7 +119,7 @@ public class HotelManager {
         room.setTotal(total);
     }
 
-    // This method processes a "Book Out" action, resetting the room to Free
+    // Kini nga method nag-proseso sa aksyon nga "Book Out", nag-reset sa kwarto ngadto sa 'Free'
     public void bookOutRoom(Room room) {
         room.setGuestName("");
         room.setBookedAt(null);
@@ -135,28 +135,26 @@ public class HotelManager {
         room.setName(baseForType(room.getType()) + " " + idx);
     }
 
-    // This method calculates the total payment based on price, nights, discount and guest count
+    // Kini nga method nagkalkula sa kinatibuk-ang bayad base sa presyo, nights, discount, ug guest count
     public double calculateTotal(double price, int nights, double discount, int guestCount) {
+        // Ang calculation kay: (Presyo *  Gabii) + (Presyo *  Bisita) - Discount
         return (price * nights) + (price * guestCount) - discount;
     }
-
-    // This method provides the default price for each room category
+    // Kini nga method naghatag sa default nga presyo para sa matag kategorya sa kwarto
     public String defaultPriceForType(String type) {
         if ("VIP BED".equals(type)) return "100";
         if ("FAMILY BED".equals(type)) return "80";
         if ("COUPLE BED".equals(type)) return "60";
         return "60";
     }
-
-    // This method provides the base naming prefix for each room type
+    // Kini nga method naghatag sa base nga prefix sa ngalan para sa matag klase sa kwarto
     public String baseForType(String type) {
         if ("VIP BED".equals(type)) return "VIP";
         if ("FAMILY BED".equals(type)) return "Family";
         if ("COUPLE BED".equals(type)) return "Couple";
         return "Double";
     }
-
-    // This method defines the room number ranges for each category
+    // Kini nga method nag-define sa range sa numero sa kwarto para sa matag kategorya
     public int[] rangeForType(String type) {
         if ("VIP BED".equalsIgnoreCase(type)) return new int[]{1, 20};
         if ("FAMILY BED".equalsIgnoreCase(type)) return new int[]{21, 40};
@@ -164,7 +162,7 @@ public class HotelManager {
         return new int[]{1, 60};
     }
 
-    // This method calculates the relative index within a room type range
+    // Kini nga method nagkalkula sa relative nga index sulod sa range sa usa ka klase sa kwarto
     public int indexForTypeRoomNo(String type, int roomNo) {
         int[] r = rangeForType(type);
         return roomNo - r[0] + 1;

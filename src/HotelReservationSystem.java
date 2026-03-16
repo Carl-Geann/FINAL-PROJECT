@@ -10,33 +10,33 @@ import java.util.Date;
  */
 public class HotelReservationSystem extends JFrame {
 
-    // --- [1. UI Components para sa Inputs] ---
+    // UI Components para sa Inputs
     private JComboBox<Integer> cbRoomNo, cbNights, cbGuestCount;
-    private JTextField txtName, txtPrice, txtGuest, txtDiscount, txtTotalPayment;
-    private JComboBox<String> cbCategory, cbStatus, cbPaymentMethod;
+    private JTextField txtName, txtPrice, txtGuest, txtDiscount, txtTotalPayment, txtStatus;
+    private JComboBox<String> cbCategory, cbPaymentMethod;
     private JSpinner spBookingAt, spBookOutAt;
 
-    // --- [2. UI Components para sa Data Display] ---
+    //UI Components para sa Data Display
     private JTable table;
     private DefaultTableModel model;
     private JTextField txtSearch;
     private JLabel lblUser, lblTotalGuests;
 
-    // --- [3. Core Logic Managers & Handlers] ---
+    //Core Logic Managers & Handlers
     public HotelManager hotelManager;
     public AuthManager authManager;
     private RoomFormHandler formHandler;
     private RoomTableHandler tableHandler;
     private GuestProfilePanel guestProfilePanel;
 
-    // --- [4. Buttons & Layout Panels] ---
+    //Buttons & Layout Panels
     private JButton btnBookOut, btnBookIn, btnSignOut;
     private JButton btnRoomDetails, btnGuestProfile;
     private JPanel detailsPanel, headerPanel, actionsPanel, leftContent;
     private CardLayout leftCardLayout;
     private JSplitPane mainSplit;
 
-    // --- [5. Theme Colors] ---
+    //Theme Colors
     private final Color THEME_RED = new Color(150, 0, 0);
     private final Color THEME_YELLOW = new Color(255, 255, 100);
     private final Color LIGHT_YELLOW = new Color(255, 255, 240);
@@ -56,7 +56,7 @@ public class HotelReservationSystem extends JFrame {
         setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH); // I-full screen ang window
     }
 
-    // --- [Method Group: Initialization] ---
+    //Initialization
 
     private void initWindowProperties() {
         setTitle("UM DEL HOTEL - Reservation List");
@@ -98,8 +98,7 @@ public class HotelReservationSystem extends JFrame {
         cbCategory = new JComboBox<>(new String[]{"VIP BED", "FAMILY BED", "COUPLE BED"});
         cbCategory.setUI(new javax.swing.plaf.basic.BasicComboBoxUI());
         
-        cbStatus = new JComboBox<>(new String[]{"Free", "Booked"});
-        cbStatus.setUI(new javax.swing.plaf.basic.BasicComboBoxUI());
+        txtStatus = new JTextField("Free"); txtStatus.setEditable(false); // Dili ma-edit ang status
         
         cbPaymentMethod = new JComboBox<>(new String[]{"Credit Card", "Debit Card", "Cash", "Online Transfer"});
         cbPaymentMethod.setUI(new javax.swing.plaf.basic.BasicComboBoxUI());
@@ -109,12 +108,12 @@ public class HotelReservationSystem extends JFrame {
         spBookOutAt = createDateSpinner();
 
         // Handlers Initialization - kini ang mga classes nga naay logic
-        formHandler = new RoomFormHandler(this, hotelManager, cbRoomNo, cbNights, cbGuestCount, txtName, txtPrice, txtGuest, txtDiscount, txtTotalPayment, cbCategory, cbStatus, cbPaymentMethod, spBookingAt, spBookOutAt);
+        formHandler = new RoomFormHandler(this, hotelManager, cbRoomNo, cbNights, cbGuestCount, txtName, txtPrice, txtGuest, txtDiscount, txtTotalPayment, cbCategory, txtStatus, cbPaymentMethod, spBookingAt, spBookOutAt);
         formHandler.updateGuestCountOptions();
         guestProfilePanel = new GuestProfilePanel(this, hotelManager, formHandler);
 
         // I-apply ang styling sa tanang input fields
-        JComponent[] fields = {cbRoomNo, txtName, cbCategory, txtGuest, cbStatus, cbGuestCount, txtPrice, cbPaymentMethod, txtDiscount, cbNights, txtTotalPayment, spBookingAt, spBookOutAt};
+        JComponent[] fields = {cbRoomNo, txtName, cbCategory, txtGuest, txtStatus, cbGuestCount, txtPrice, cbPaymentMethod, txtDiscount, cbNights, txtTotalPayment, spBookingAt, spBookOutAt};
         for (JComponent f : fields) {
             f.setFont(fieldFont); f.setBackground(LIGHT_YELLOW); f.setForeground(THEME_RED);
             f.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
@@ -182,7 +181,7 @@ public class HotelReservationSystem extends JFrame {
 
         String[] labels = {"Room No", "Room", "Category", "Guest Name", "Status", "Guests In", "Price", "Payment Method", "Discount", "Nights", "Total Payment", "Booking Date/Time", "Book Out"};
         String[] iconPaths = {"room no.png", "room.png", "category.png", "guest list.png", "status.png", "occupied.png", "total payment.png", "payment method.png", "discount.png", "book_in.png", "total payment.png", "book_in.png", "book out.png"};
-        JComponent[] fields = {cbRoomNo, txtName, cbCategory, txtGuest, cbStatus, cbGuestCount, txtPrice, cbPaymentMethod, txtDiscount, cbNights, txtTotalPayment, spBookingAt, spBookOutAt};
+        JComponent[] fields = {cbRoomNo, txtName, cbCategory, txtGuest, txtStatus, cbGuestCount, txtPrice, cbPaymentMethod, txtDiscount, cbNights, txtTotalPayment, spBookingAt, spBookOutAt};
 
         Font labelFont = new Font("Trade Gothic", Font.BOLD, 13);
         if (labelFont.getFamily().equals("Dialog")) labelFont = new Font("Arial", Font.BOLD, 13);
@@ -343,18 +342,36 @@ public class HotelReservationSystem extends JFrame {
             }
         });
 
-        // Listener kon nausab ang status o category sa form
-        cbStatus.addActionListener(e -> { if ("Booked".equals(cbStatus.getSelectedItem())) { spBookingAt.setValue(new Date()); spBookOutAt.setValue(new Date()); } });
-        cbCategory.addActionListener(e -> { formHandler.updateRoomNoOptions(); formHandler.updateGuestCountOptions(); });
-        cbRoomNo.addActionListener(e -> { Integer val = (Integer) cbRoomNo.getSelectedItem(); if (val != null) { Room r = hotelManager.findRoomByNo(val); if (r != null) formHandler.selectRoomInForm(r); } });
+        // Listener kon nausab ang kategorya sa form
+        cbCategory.addActionListener(e -> { 
+            formHandler.updateRoomNoOptions(); 
+            formHandler.updateGuestCountOptions(); 
+            formHandler.updatePriceFromCategory(); // Update price based on category
+        });
+        
+        cbRoomNo.addActionListener(e -> { 
+            Integer val = (Integer) cbRoomNo.getSelectedItem(); 
+            if (val != null) { 
+                Room r = hotelManager.findRoomByNo(val); 
+                if (r != null) formHandler.selectRoomInForm(r); 
+            } 
+        });
+
+        // Listeners para sa live calculation sa total payment
+        cbNights.addActionListener(e -> formHandler.calculateTotal());
+        cbGuestCount.addActionListener(e -> formHandler.calculateTotal());
+        txtDiscount.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyReleased(java.awt.event.KeyEvent e) { formHandler.calculateTotal(); }
+        });
     }
 
-   
+    // Logic & Auth
 
     // I-update ang UI depende kung naay naka-login o wala
     public void updateAuthUI() {
         boolean signedIn = authManager.isSignedIn();
-        JComponent[] inputs = {cbRoomNo, txtName, txtPrice, txtGuest, cbNights, txtDiscount, cbGuestCount, cbCategory, cbStatus, cbPaymentMethod, btnBookIn, btnBookOut};
+        JComponent[] inputs = {cbRoomNo, txtName, txtPrice, txtGuest, cbNights, txtDiscount, cbGuestCount, cbCategory, txtStatus, cbPaymentMethod, btnBookIn, btnBookOut};
         for (JComponent c : inputs) c.setEnabled(signedIn); // I-disable ang form kung walay naka-login
         lblUser.setText(signedIn ? ("Signed in as " + authManager.getCurrentUser()) : "Signed out");
         updateActionButtons();
@@ -385,7 +402,7 @@ public class HotelReservationSystem extends JFrame {
         } else System.exit(0);
     }
 
-    
+    // Utilities
 
     public void roomUpdateTable() { tableHandler.roomUpdateTable(); } // I-refresh ang data sa table
     public void showRoomDetails() { leftCardLayout.show(leftContent, "details"); } // I-show ang details form
@@ -399,7 +416,7 @@ public class HotelReservationSystem extends JFrame {
         return null;
     }
 
-    //  methods para sa paghimo og buttons nga naay styling
+    // Helper methods para sa paghimo og buttons nga naay styling
     private JButton createNavButton(String t, Font f, Color bg, Color fg, String p) {
         JButton b = new JButton(t); b.setFont(f); b.setBackground(bg); b.setForeground(fg);
         b.setFocusPainted(false); b.setBorder(BorderFactory.createLineBorder(fg, 1));

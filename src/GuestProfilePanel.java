@@ -18,7 +18,7 @@ public class GuestProfilePanel extends JPanel {
     private JList<Room> guestList;
     private DefaultListModel<Room> listModel;
     
-    // --- [2. Logic Managers ug Data] ---
+    // Logic Managers ug Data
     private HotelReservationSystem system;
     private HotelManager hotelManager;
     private RoomFormHandler formHandler;
@@ -27,8 +27,7 @@ public class GuestProfilePanel extends JPanel {
     private boolean isLoading = false;
     private final Color THEME_RED = new Color(150, 0, 0), LIGHT_YELLOW = new Color(255, 255, 224);
 
-    // --- [Method Group: Initialization] ---
-    
+    // [Method Group: Initialization
     /**
      * Constructor para sa pag-setup sa panel
      */
@@ -167,7 +166,7 @@ public class GuestProfilePanel extends JPanel {
         });
     }
 
-    // --- [Method Group: UI Helpers] ---
+    // UI 
 
     private JTextField createField(Font font, int width) {
         JTextField f = new JTextField(); f.setFont(font); f.setForeground(THEME_RED); f.setBackground(Color.WHITE);
@@ -249,7 +248,7 @@ public class GuestProfilePanel extends JPanel {
         });
     }
 
-    // --- [Method Group: Profile Logic] ---
+    // Profile Code
 
     /**
      * I-load ang data sa napili nga bisita gikan sa listahan
@@ -301,7 +300,7 @@ public class GuestProfilePanel extends JPanel {
             double discount = 0;
             try { discount = Double.parseDouble(txtDiscount.getText().trim()); } catch (Exception ignored) {}
             
-            double total = (price * nights) + (price * guests) - discount;
+            double total = hotelManager.calculateTotal(price, nights, discount, guests);
             txtTotalAmount.setText("P " + String.format("%,.2f", total));
         }
     }
@@ -332,8 +331,9 @@ public class GuestProfilePanel extends JPanel {
             try { discount = Double.parseDouble(txtDiscount.getText().trim()); } catch (Exception ignored) {}
             currentRoom.setDiscount(discount);
             
+            // Re-calculate ang total payment gamit ang HotelManager method
             double price = Double.parseDouble(currentRoom.getPrice());
-            double total = (price * currentRoom.getNights()) + (price * currentRoom.getGuestCount()) - currentRoom.getDiscount();
+            double total = hotelManager.calculateTotal(price, currentRoom.getNights(), currentRoom.getDiscount(), currentRoom.getGuestCount());
             currentRoom.setTotal(total);
             
             java.util.Calendar cal = java.util.Calendar.getInstance();
@@ -348,12 +348,12 @@ public class GuestProfilePanel extends JPanel {
 
     private void bookOut() {
         if (currentRoom == null) return;
-        if (JOptionPane.showConfirmDialog(this, "Book out confirmed ? : " + currentRoom.getName() + "?", "Confirm Book Out", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+        if (JOptionPane.showConfirmDialog(this, "Book Confirmed ? " + currentRoom.getName() + "?", "Confirm Book Out", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
             hotelManager.bookOutRoom(currentRoom); 
             system.roomUpdateTable(); 
             formHandler.clearFields(); 
             clearFields(); 
-            JOptionPane.showMessageDialog(this, "Book out process completed !");
+            JOptionPane.showMessageDialog(this, "Booking out process completed !");
             system.showRoomDetails(); 
         }
     }
