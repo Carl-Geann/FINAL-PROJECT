@@ -10,33 +10,33 @@ import java.util.Date;
  */
 public class HotelReservationSystem extends JFrame {
 
-    // --- [1. UI Components para sa Inputs] ---
+    // UI Components para sa Inputs
     private JComboBox<Integer> cbRoomNo, cbNights, cbGuestCount;
     private JTextField txtName, txtPrice, txtGuest, txtDiscount, txtTotalPayment, txtStatus;
     private JComboBox<String> cbCategory, cbPaymentMethod;
     private JSpinner spBookingAt, spBookOutAt;
 
-    // --- [2. UI Components para sa Data Display] ---
+    // UI Components para sa Data Display
     private JTable table;
     private DefaultTableModel model;
     private JTextField txtSearch;
     private JLabel lblUser, lblTotalGuests;
 
-    // --- [3. Core Logic Managers & Handlers] ---
+    // Core Logic Managers & Handlers
     public HotelManager hotelManager;
     public AuthManager authManager;
     private RoomFormHandler formHandler;
     private RoomTableHandler tableHandler;
     private GuestProfilePanel guestProfilePanel;
 
-    // --- [4. Buttons & Layout Panels] ---
+    // Buttons & Layout Panels
     private JButton btnBookIn, btnSignOut;
     private JButton btnRoomDetails, btnGuestProfile;
     private JPanel detailsPanel, headerPanel, actionsPanel, leftContent;
     private CardLayout leftCardLayout;
     private JSplitPane mainSplit;
 
-    // --- [5. Theme Colors] ---
+    // Theme Colors
     private final Color THEME_RED = new Color(150, 0, 0);
     private final Color THEME_YELLOW = new Color(255, 255, 100);
     private final Color LIGHT_YELLOW = new Color(255, 255, 240);
@@ -56,7 +56,7 @@ public class HotelReservationSystem extends JFrame {
         setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH); // I-full screen ang window
     }
 
-    // --- [Method Group: Initialization] ---
+    // Initialization
 
     private void initWindowProperties() {
         setTitle("UM DEL HOTEL - Reservation List");
@@ -364,7 +364,7 @@ public class HotelReservationSystem extends JFrame {
         });
     }
 
-    // --- [Method Group: Logic & Auth] ---
+    //Auth
 
     // I-update ang UI depende kung naay naka-login o wala
     public void updateAuthUI() {
@@ -399,7 +399,7 @@ public class HotelReservationSystem extends JFrame {
         } else System.exit(0);
     }
 
-    // --- [Method Group: Utilities] ---
+    // Utilities
 
     public void roomUpdateTable() { tableHandler.roomUpdateTable(); } // I-refresh ang data sa table
     public void showRoomDetails() { leftCardLayout.show(leftContent, "details"); } // I-show ang details form
