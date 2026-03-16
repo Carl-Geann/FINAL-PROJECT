@@ -10,33 +10,33 @@ import java.util.Date;
  */
 public class HotelReservationSystem extends JFrame {
 
-    // UI Components para sa Inputs
+    // --- [1. UI Components para sa Inputs] ---
     private JComboBox<Integer> cbRoomNo, cbNights, cbGuestCount;
     private JTextField txtName, txtPrice, txtGuest, txtDiscount, txtTotalPayment, txtStatus;
     private JComboBox<String> cbCategory, cbPaymentMethod;
     private JSpinner spBookingAt, spBookOutAt;
 
-    //UI Components para sa Data Display
+    // --- [2. UI Components para sa Data Display] ---
     private JTable table;
     private DefaultTableModel model;
     private JTextField txtSearch;
     private JLabel lblUser, lblTotalGuests;
 
-    //Core Logic Managers & Handlers
+    // --- [3. Core Logic Managers & Handlers] ---
     public HotelManager hotelManager;
     public AuthManager authManager;
     private RoomFormHandler formHandler;
     private RoomTableHandler tableHandler;
     private GuestProfilePanel guestProfilePanel;
 
-    //Buttons & Layout Panels
-    private JButton btnBookOut, btnBookIn, btnSignOut;
+    // --- [4. Buttons & Layout Panels] ---
+    private JButton btnBookIn, btnSignOut;
     private JButton btnRoomDetails, btnGuestProfile;
     private JPanel detailsPanel, headerPanel, actionsPanel, leftContent;
     private CardLayout leftCardLayout;
     private JSplitPane mainSplit;
 
-    //Theme Colors
+    // --- [5. Theme Colors] ---
     private final Color THEME_RED = new Color(150, 0, 0);
     private final Color THEME_YELLOW = new Color(255, 255, 100);
     private final Color LIGHT_YELLOW = new Color(255, 255, 240);
@@ -56,7 +56,7 @@ public class HotelReservationSystem extends JFrame {
         setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH); // I-full screen ang window
     }
 
-    //Initialization
+    // --- [Method Group: Initialization] ---
 
     private void initWindowProperties() {
         setTitle("UM DEL HOTEL - Reservation List");
@@ -204,13 +204,12 @@ public class HotelReservationSystem extends JFrame {
         formScroll.setBackground(THEME_RED); formScroll.getViewport().setBackground(THEME_RED);
         formScroll.setBorder(null);
 
-        // Panel para sa mga aksyon (Book In/Out)
-        actionsPanel = new JPanel(new GridLayout(1, 2, 10, 0));
+        // Panel para sa mga aksyon (Book In)
+        actionsPanel = new JPanel(new GridLayout(1, 1, 10, 0)); // Change to 1 column
         actionsPanel.setBackground(THEME_RED);
         actionsPanel.setPreferredSize(new Dimension(500, 45));
         btnBookIn = createActionButton("Book In", labelFont, THEME_YELLOW, THEME_RED, "book_in.png");
-        btnBookOut = createActionButton("Book Out", labelFont, THEME_YELLOW, THEME_RED, "book out.png");
-        actionsPanel.add(btnBookIn); actionsPanel.add(btnBookOut);
+        actionsPanel.add(btnBookIn); 
 
         detailsPanel.add(formScroll, BorderLayout.CENTER);
         detailsPanel.add(actionsPanel, BorderLayout.SOUTH);
@@ -322,9 +321,8 @@ public class HotelReservationSystem extends JFrame {
         // I-switch ang view ngadto sa Guest Profile ug i-load ang data
         btnGuestProfile.addActionListener(e -> { guestProfilePanel.loadGuestData(formHandler.getCurrentSelected()); leftCardLayout.show(leftContent, "guestProfile"); });
         
-        // Aksyon inig click sa Book In ug Book Out
+        // Aksyon inig click sa Book In
         btnBookIn.addActionListener(e -> formHandler.bookInRoom());
-        btnBookOut.addActionListener(e -> formHandler.bookOutRoom());
 
         // Live search listener samtang nag-type sa search field
         txtSearch.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
@@ -366,12 +364,12 @@ public class HotelReservationSystem extends JFrame {
         });
     }
 
-    // Logic & Auth
+    // --- [Method Group: Logic & Auth] ---
 
     // I-update ang UI depende kung naay naka-login o wala
     public void updateAuthUI() {
         boolean signedIn = authManager.isSignedIn();
-        JComponent[] inputs = {cbRoomNo, txtName, txtPrice, txtGuest, cbNights, txtDiscount, cbGuestCount, cbCategory, txtStatus, cbPaymentMethod, btnBookIn, btnBookOut};
+        JComponent[] inputs = {cbRoomNo, txtName, txtPrice, txtGuest, cbNights, txtDiscount, cbGuestCount, cbCategory, txtStatus, cbPaymentMethod, btnBookIn};
         for (JComponent c : inputs) c.setEnabled(signedIn); // I-disable ang form kung walay naka-login
         lblUser.setText(signedIn ? ("Signed in as " + authManager.getCurrentUser()) : "Signed out");
         updateActionButtons();
@@ -384,9 +382,8 @@ public class HotelReservationSystem extends JFrame {
         if (r != null) {
             boolean isBooked = "Booked".equals(r.getStatus());
             btnBookIn.setEnabled(signedIn && !isBooked);
-            btnBookOut.setEnabled(signedIn && isBooked);
         } else {
-            btnBookIn.setEnabled(false); btnBookOut.setEnabled(false);
+            btnBookIn.setEnabled(false); 
         }
     }
 
@@ -402,7 +399,7 @@ public class HotelReservationSystem extends JFrame {
         } else System.exit(0);
     }
 
-    // Utilities
+    // --- [Method Group: Utilities] ---
 
     public void roomUpdateTable() { tableHandler.roomUpdateTable(); } // I-refresh ang data sa table
     public void showRoomDetails() { leftCardLayout.show(leftContent, "details"); } // I-show ang details form

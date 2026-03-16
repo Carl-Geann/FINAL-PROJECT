@@ -27,7 +27,7 @@ public class GuestProfilePanel extends JPanel {
     private boolean isLoading = false;
     private final Color THEME_RED = new Color(150, 0, 0), LIGHT_YELLOW = new Color(255, 255, 224);
 
-    // [Method Group: Initialization
+    // admin[Method Group: Initialization
     /**
      * Constructor para sa pag-setup sa panel
      */
