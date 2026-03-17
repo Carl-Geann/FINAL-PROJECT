@@ -15,7 +15,7 @@ public class Main {
             LoginDialog login = new LoginDialog(system, system.authManager);
             login.setVisible(true);
             
-            //  malampuson ang authentication, i-setup ang user session ug ipakita ang main frame
+            //  access for authentication, i-setup ang user session ug ipakita ang main frame
             if (login.isAuthenticated()) {
                 system.setSignedIn(true);
                 system.setCurrentUser(login.getLoggedInUser());

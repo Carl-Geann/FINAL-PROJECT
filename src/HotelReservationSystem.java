@@ -22,7 +22,7 @@ public class HotelReservationSystem extends JFrame {
     private JTextField txtSearch;
     private JLabel lblUser, lblTotalGuests;
 
-    // Core Logic Managers & Handlers
+    //  Managers Handlers
     public HotelManager hotelManager;
     public AuthManager authManager;
     private RoomFormHandler formHandler;
