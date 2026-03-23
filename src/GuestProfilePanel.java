@@ -6,8 +6,8 @@ import javax.swing.DefaultListCellRenderer;
 import java.awt.Component;
 
 /**
- * Kini nga class nga GuestProfilePanel kay para sa pagpakita ug pag-edit sa profile sa bisita.
- * Kini nagpakita sa mga detalye sa booking sama sa oras sa check-in/out, kwarto, ug bayad.
+ * UI panel responsible for displaying and editing guest profile information and booking details.
+ * Displays comprehensive booking details including check-in/out times, room assignment, and payment status.
  */
 public class GuestProfilePanel extends JPanel {
     // UI Components para sa Inputs
@@ -29,13 +29,13 @@ public class GuestProfilePanel extends JPanel {
 
     // admin[Method Group: Initialization
     /**
-     * Constructor para sa pag-setup sa panel
+     * Constructor to initialize the guest profile panel with necessary managers and handlers.
      */
     public GuestProfilePanel(HotelReservationSystem system, HotelManager hotelManager, RoomFormHandler formHandler) {
         this.system = system; this.hotelManager = hotelManager; this.formHandler = formHandler;
-        initComponents(); // I-initialize ang mga components
-        initLayout();     // I-set up ang visual structure
-        initListeners();  // I-attach ang mga action listeners
+        initComponents(); // Initializes all Swing UI components used in the panel
+        initLayout();     // Sets up the visual layout and positioning of components within the panel
+        initListeners();  // Attaches event listeners to handle user interactions
     }
 
     private Font getFont(int size) {
@@ -50,12 +50,12 @@ public class GuestProfilePanel extends JPanel {
         guestList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         guestList.setFont(fontField); guestList.setForeground(THEME_RED); guestList.setFixedCellHeight(30); 
         
-        // Custom renderer para sa listahan sa mga bisita
+        // Custom list cell renderer to format how guest information is displayed in the JList
         guestList.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                label.setFont(fontField); // Siguradohon nga bold ang font sa list
+                label.setFont(fontField); // Sets the font to bold for items within the guest list
                 if (value instanceof Room) {
                     Room r = (Room) value;
                     label.setText(" " + (r.getGuestName() != null ? r.getGuestName().toUpperCase() : "") + " - " + r.getName());
@@ -66,24 +66,24 @@ public class GuestProfilePanel extends JPanel {
             }
         });
 
-        // Pag-create sa mga text fields
+        // Initializes and configures the text input fields for guest information
         txtGuestName = createField(fontField, 240);
         txtRoomName = createField(fontField, 240); txtRoomName.setEditable(false);
         
-        // Pag-setup sa mga combo boxes
+        // Initializes and populates the dropdown selection boxes (combo boxes)
         cbGuestCount = createComboBox(fontField, 240);
         cbPaymentMethod = createComboBox(fontField, 240);
         cbPaymentMethod.setModel(new DefaultComboBoxModel<>(new String[]{"Credit Card", "Debit Card", "Cash", "Online Transfer"}));
         cbNights = createComboBox(fontField, 240);
         for (int i = 1; i <= 7; i++) cbNights.addItem(i);
 
-        // Uban pang mga fields
+        // Initializes additional data fields like check-in/out times and totals
         txtBookInTime = createField(fontField, 240); txtBookInTime.setEditable(false);
         txtBookOutTime = createField(fontField, 240); txtBookOutTime.setEditable(false);
         txtDiscount = createField(fontField, 240); 
         txtTotalAmount = createField(fontField, 240); txtTotalAmount.setEditable(false);
 
-        // Pag-style sa mga buttons
+        // Applies consistent visual styling to the action buttons
         btnUpdate = styleButton(new JButton("Update Profile"), getFont(14));
         btnBookOut = styleButton(new JButton("Book Out Room"), getFont(14));
     }
@@ -97,7 +97,7 @@ public class GuestProfilePanel extends JPanel {
         lblHeader.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
         add(lblHeader, BorderLayout.NORTH);
 
-        // Main container para sa listahan ug form nga dunay GridBagLayout
+        // Main container using GridBagLayout to organize the guest list and the detail form
         JPanel mainContainer = new JPanel(new GridBagLayout());
         mainContainer.setBackground(LIGHT_YELLOW);
         mainContainer.setBorder(BorderFactory.createCompoundBorder(
@@ -108,14 +108,14 @@ public class GuestProfilePanel extends JPanel {
         GridBagConstraints mg = new GridBagConstraints();
         mg.gridx = 0; mg.fill = GridBagConstraints.BOTH; mg.weightx = 1.0;
 
-        // ScrollPane para sa listahan sa mga bisita
+        // Scrollable pane to hold and display the list of currently booked guests
         JScrollPane scrollPane = new JScrollPane(guestList);
         scrollPane.setPreferredSize(new Dimension(450, 250)); 
         scrollPane.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(THEME_RED, 2), "Currently Booked Guests", 0, 0, getFont(16), THEME_RED));
         mg.gridy = 0; mg.weighty = 0.5;
         mainContainer.add(scrollPane, mg);
 
-        // Form panel para sa mga detalye sa bisita
+        // Sub-panel containing the input form for viewing and editing specific guest details
         JPanel formPanel = new JPanel(new GridBagLayout()); 
         formPanel.setBackground(LIGHT_YELLOW);
         GridBagConstraints fg = new GridBagConstraints();
@@ -123,7 +123,7 @@ public class GuestProfilePanel extends JPanel {
         fg.fill = GridBagConstraints.NONE; 
         fg.anchor = GridBagConstraints.WEST;
 
-        // Idugang ang mga labels ug fields sa form panel
+        // Dynamically adds descriptive labels and their corresponding input components to the form
         String[] labels = {"Guest Name : ", "Room : ", "Number of Guests : ", "Payment Method : ", "Nights : ", "Book In Time : ", "Book Out Time : ", "Discount : ", "Total Amount : "};
         JComponent[] components = {txtGuestName, txtRoomName, cbGuestCount, cbPaymentMethod, cbNights, txtBookInTime, txtBookOutTime, txtDiscount, txtTotalAmount};
         for (int i = 0; i < labels.length; i++) addLabelAndComponent(formPanel, labels[i], components[i], fg, i);
@@ -142,22 +142,22 @@ public class GuestProfilePanel extends JPanel {
     }
 
     private void initListeners() {
-        // Listener para sa pag-update sa profile inig click sa button
+        // Handles the action event for the update button to save changes to the guest profile
         btnUpdate.addActionListener(e -> updateProfile()); 
         
-        // Listener para sa pag-book out sa kwarto inig click sa button
+        // Handles the action event for the book-out button to process a guest's check-out
         btnBookOut.addActionListener(e -> bookOut());     
         
-        // Listener inig pili og bisita gikan sa listahan
+        // Handles selection changes in the guest list to load the corresponding data into the form
         guestList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && !isLoading && guestList.getSelectedValue() != null) loadGuestData(guestList.getSelectedValue());
         });
         
-        // Listeners para sa awtomatiko nga pagkalkula sa total ug book-out date
+        // Event listeners that trigger automatic updates to the total amount and check-out date
         cbNights.addActionListener(e -> updateBookOutDateAndTotal());
         cbGuestCount.addActionListener(e -> updateBookOutDateAndTotal());
         
-        // Listener para sa pagkalkula sa total inig usab sa discount (gamit ang keyboard)
+        // Recalculates the total payment in real-time as the user types a discount value
         txtDiscount.addKeyListener(new java.awt.event.KeyAdapter() {
             @Override
             public void keyReleased(java.awt.event.KeyEvent e) {
@@ -251,14 +251,18 @@ public class GuestProfilePanel extends JPanel {
     // Profile Code
 
     /**
-     * I-load ang data sa napili nga bisita gikan sa listahan
+     * Loads the details of the selected guest from the list into the form fields.
      */
     public void loadGuestData(Room room) {
         if (isLoading) return;
-        isLoading = true; refreshGuestList(); this.currentRoom = room;
+        isLoading = true; 
+        refreshGuestList(); 
+        this.currentRoom = room;
+        
         if (room != null && "Booked".equals(room.getStatus())) {
             if (guestList.getSelectedValue() != room) guestList.setSelectedValue(room, true);
-            txtGuestName.setText(room.getGuestName()); txtRoomName.setText(room.getName() + " (" + room.getType() + ")");
+            txtGuestName.setText(room.getGuestName()); 
+            txtRoomName.setText(room.getName() + " (" + room.getType() + ")");
             
             updateGuestCountOptions(room.getType());
             cbGuestCount.setSelectedItem(room.getGuestCount());
@@ -271,11 +275,11 @@ public class GuestProfilePanel extends JPanel {
             txtTotalAmount.setText("P " + String.format("%,.2f", room.getTotal()));
             btnUpdate.setEnabled(true); btnBookOut.setEnabled(true);
         } else {
-            if (room == null && !listModel.isEmpty()) {
-                guestList.setSelectedIndex(0);
-                if (guestList.getSelectedValue() != null) { isLoading = false; loadGuestData(guestList.getSelectedValue()); return; }
-            }
-            clearFields(); btnUpdate.setEnabled(false); btnBookOut.setEnabled(false);
+            // No room selected or room is not booked - show empty form
+            guestList.clearSelection();
+            clearFields(); 
+            btnUpdate.setEnabled(false); 
+            btnBookOut.setEnabled(false);
         }
         isLoading = false;
     }
@@ -331,7 +335,7 @@ public class GuestProfilePanel extends JPanel {
             try { discount = Double.parseDouble(txtDiscount.getText().trim()); } catch (Exception ignored) {}
             currentRoom.setDiscount(discount);
             
-            // Re-calculate ang total payment gamit ang HotelManager method
+            // Invokes the HotelManager's calculation logic to determine the final total payment
             double price = Double.parseDouble(currentRoom.getPrice());
             double total = hotelManager.calculateTotal(price, currentRoom.getNights(), currentRoom.getDiscount(), currentRoom.getGuestCount());
             currentRoom.setTotal(total);

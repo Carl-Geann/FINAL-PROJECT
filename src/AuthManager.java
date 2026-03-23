@@ -2,51 +2,52 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Kini nga class nga AuthManager kay para sa pag-handle sa user authentication ug session state
- * Kini ang nagdumala sa user nga naka-sign in karon ug ang ilang status sa pag-login
+ * Manages user authentication processes and maintains the current session state.
+ * Keeps track of the currently authenticated user and their authorization status.
  */
 public class AuthManager {
-    // Kini nga boolean kay nagsubay kung ang user naka-login ba karon sa sistema
+    // Boolean flag indicating whether a user is currently signed into the application.
     private boolean signedIn = false;
-    // Kini nga string kay nagtipig sa email o username sa user nga naka-login karon
+    // Stores the username or email address of the currently authenticated user.
     private String currentUser;
-    // Kini nga map kay nagtipig sa mga rehistradong user ug ang ilang mga password
+    // A map containing registered usernames as keys and their corresponding passwords as values.
     private Map<String, String> users = new LinkedHashMap<>();
 
     public AuthManager() {
-        // Nag-initialize sa mga default nga account sa user
+        // Populates the user map with a set of default administrative and staff accounts.
         users.put("admin", "123");
         users.put("staff@hotel.com", "staff123");
     }
 
-    // Kini nga method kay nag-check kung naay naka-sign in
+    // Returns the current authentication status (true if signed in, false otherwise).
     public boolean isSignedIn() {
         return signedIn;
     }
 
-    // Kini nga method kay naga-update sa status sa sign-in
+    // Updates the current session's authentication status.
     public void setSignedIn(boolean signedIn) {
         this.signedIn = signedIn;
     }
 
-    // Kini nga method kay nagkuha sa email sa user karon
+    // Retrieves the identifier (username or email) of the currently signed-in user.
     public String getCurrentUser() {
         return currentUser;
     }
 
-    // Kini nga method kay nag-set kung kinsa ang user karon
+    // Sets the identifier for the currently authenticated user.
     public void setCurrentUser(String currentUser) {
         this.currentUser = currentUser;
     }
 
-    // Kini nga method kay nag-return sa map sa tanang naka sign user
+    // Returns the complete map of registered users and their credentials.
     public Map<String, String> getUsers() {
         return users;
     }
 
-    // Kini nga method kay nagpresent sa pag-update sa tibuok database sa mga user
+    // Updates the entire collection of registered users by replacing the current map with a new one.
     public void setUsers(Map<String, String> users) {
         this.users.clear();
         this.users.putAll(users);
     }
 }
+

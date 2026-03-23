@@ -3,12 +3,12 @@ import java.util.Date;
 import java.text.ParseException;
 
 /**
- * Kini nga class nga RoomFormHandler kay para sa pagdumala sa logic sa Room Details form
- * Kini ang nag-handle sa field validation, pagkalkula, ug pakig-uban tali sa form UI ug sa HotelManager
+ * Manages the business logic and user interactions for the Room Details form.
+ * Responsible for field validation, payment calculations, and synchronizing the UI with the HotelManager.
  */
 public class RoomFormHandler {
 
-    // UI Components gikan sa Form
+    // UI Components from Form
     private JComboBox<Integer> cbRoomNo, cbNights, cbGuestCount;
     private JTextField txtName, txtPrice, txtGuest, txtDiscount, txtTotalPayment, txtStatus;
     private JComboBox<String> cbCategory, cbPaymentMethod;
@@ -18,7 +18,11 @@ public class RoomFormHandler {
     private HotelManager hotelManager;
     private HotelReservationSystem system;
     private Room currentSelected;
+    private boolean isUpdating = false;
 
+    /**
+     * Constructor to initialize the form handler with all necessary UI components and managers.
+     */
     public RoomFormHandler(HotelReservationSystem system, HotelManager hotelManager,
             JComboBox<Integer> cbRoomNo, JComboBox<Integer> cbNights, JComboBox<Integer> cbGuestCount,
             JTextField txtName, JTextField txtPrice, JTextField txtGuest, JTextField txtDiscount,
@@ -44,57 +48,82 @@ public class RoomFormHandler {
 
     // UI Updates & Reset
 
-    // Kini nga method nag-reset sa tanang field sa form ngadto sa ilang default nga walay sulod.
+    /**
+     * Resets all form fields to their default values and clears any current selection.
+     */
     public void clearFields() {
-        cbRoomNo.setSelectedIndex(-1);
-        txtName.setText("");
-        txtPrice.setText("");
-        txtGuest.setText("");
-        cbNights.setSelectedIndex(0);
-        txtDiscount.setText("0");
-        txtTotalPayment.setText("0.00");
-        cbGuestCount.setSelectedIndex(0);
-        cbCategory.setSelectedIndex(0);
-        
-        updateRoomNoOptions();
-        updateGuestCountOptions();
-        
-        txtStatus.setText("Free");
-        cbPaymentMethod.setSelectedIndex(0);
-        spBookingAt.setValue(new Date());
-        spBookingAt.setEnabled(false);
-        spBookOutAt.setValue(new Date());
-        spBookOutAt.setEnabled(false);
-        
-        currentSelected = null;
-        system.roomUpdateTable(); // I-refresh ang table selection
-        system.updateActionButtons();
+        isUpdating = true;
+        try {
+            cbRoomNo.setSelectedIndex(-1);
+            txtName.setText("");
+            txtPrice.setText("");
+            txtGuest.setText("");
+            cbNights.setSelectedIndex(0);
+            txtDiscount.setText("0");
+            txtTotalPayment.setText("0.00");
+            cbGuestCount.setSelectedIndex(0);
+            cbCategory.setSelectedIndex(0);
+            
+            updateRoomNoOptions();
+            updateGuestCountOptions();
+            
+            txtStatus.setText("Free");
+            cbPaymentMethod.setSelectedIndex(0);
+            spBookingAt.setValue(new Date());
+            spBookingAt.setEnabled(false);
+            spBookOutAt.setValue(new Date());
+            spBookOutAt.setEnabled(false);
+            
+            currentSelected = null;
+            system.roomUpdateTable(); // Refresh table selection
+            system.updateActionButtons();
+        } finally {
+            isUpdating = false;
+        }
     }
 
-    // Kini nga method nagpuno sa form og data gikan sa napili nga Room object
+    /**
+     * Populates the form fields with data from a specific Room object.
+     */
     public void selectRoomInForm(Room r) {
-        currentSelected = r;
-        cbCategory.setSelectedItem(r.getType());
-        updateRoomNoOptions();
-        updateGuestCountOptions();
-        cbRoomNo.setSelectedItem(r.getRoomNo());
-        txtName.setText(r.getName());
-        txtStatus.setText(r.getStatus());
-        txtPrice.setText(r.getPrice());
-        cbNights.setSelectedItem(r.getNights());
-        txtDiscount.setText(String.valueOf(r.getDiscount()));
-        cbGuestCount.setSelectedItem(r.getGuestCount());
-        calculateTotal();
-        cbPaymentMethod.setSelectedItem(r.getPaymentMethod());
-        txtGuest.setText(r.getGuestName() != null ? r.getGuestName() : "");
-        
-        if (r.getBookedAt() != null) spBookingAt.setValue(r.getBookedAt());
-        if (r.getBookOutAt() != null) spBookOutAt.setValue(r.getBookOutAt());
-        
-        system.updateActionButtons();
+        if (r == null) return;
+        isUpdating = true;
+        try {
+            currentSelected = r;
+            cbCategory.setSelectedItem(r.getType());
+            updateRoomNoOptions();
+            updateGuestCountOptions();
+            cbRoomNo.setSelectedItem(r.getRoomNo());
+            txtName.setText(r.getName());
+            txtStatus.setText(r.getStatus());
+            txtPrice.setText(r.getPrice());
+            cbNights.setSelectedItem(r.getNights());
+            txtDiscount.setText(String.valueOf(r.getDiscount()));
+            
+            // Set guest count if valid, otherwise default to 1 for Booked rooms or 0 for Free
+            int count = r.getGuestCount();
+            if (count > 0) {
+                cbGuestCount.setSelectedItem(count);
+            } else {
+                cbGuestCount.setSelectedIndex(0);
+            }
+            
+            calculateTotal();
+            cbPaymentMethod.setSelectedItem(r.getPaymentMethod());
+            txtGuest.setText(r.getGuestName() != null ? r.getGuestName() : "");
+            
+            if (r.getBookedAt() != null) spBookingAt.setValue(r.getBookedAt());
+            if (r.getBookOutAt() != null) spBookOutAt.setValue(r.getBookOutAt());
+            
+            system.updateActionButtons();
+        } finally {
+            isUpdating = false;
+        }
     }
 
-    // Kini nga method naga-update sa room number dropdown base sa napili nga kategorya
+    /**
+     * Dynamically updates the room number dropdown list based on the currently selected category.
+     */
     public void updateRoomNoOptions() {
         if (cbRoomNo == null || cbCategory == null) return;
         cbRoomNo.removeAllItems();
@@ -105,7 +134,9 @@ public class RoomFormHandler {
         cbRoomNo.setSelectedIndex(-1);
     }
 
-    // Kini nga method naga-update sa guest count dropdown base sa kapasidad sa kategorya sa kwarto.
+    /**
+     * Updates the available guest count options based on the capacity of the selected room category.
+     */
     public void updateGuestCountOptions() {
         if (cbGuestCount == null || cbCategory == null) return;
         int maxGuests = 2;
@@ -124,7 +155,9 @@ public class RoomFormHandler {
         else cbGuestCount.setSelectedIndex(0);
     }
 
-    // Kini nga method naga-update sa price field base sa default price sa kategorya.
+    /**
+     * Updates the nightly price field to the default rate for the selected room category.
+     */
     public void updatePriceFromCategory() {
         if (cbCategory == null || txtPrice == null) return;
         Object sel = cbCategory.getSelectedItem();
@@ -135,7 +168,9 @@ public class RoomFormHandler {
 
     // --- [Method Group: Core Logic & Calculations] ---
 
-    // Kini nga method nagkalkula sa total nga bayad base sa presyo, gidaghanon sa gabii, ug mga discount.
+    /**
+     * Recalculates the total payment amount based on nightly rate, stay duration, guest count, and discounts.
+     */
     public void calculateTotal() {
         try {
             double price = Double.parseDouble(txtPrice.getText().isEmpty() ? "0" : txtPrice.getText());
@@ -149,7 +184,9 @@ public class RoomFormHandler {
         }
     }
 
-    // Kini nga method awtomatiko nga naga-update sa gitagna nga check-out date base sa nights.
+    /**
+     * Automatically calculates and updates the expected check-out date based on the check-in date and stay duration.
+     */
     public void updateBookOutDate() {
         Date bookingAt = (Date) spBookingAt.getValue();
         Integer nights = (Integer) cbNights.getSelectedItem();
@@ -161,9 +198,11 @@ public class RoomFormHandler {
         }
     }
 
-    //  Booking Operations
+    // Booking Operations
 
-    // Kini nga method nag-proseso sa "Book In" nga request para sa napili nga kwarto
+    /**
+     * Validates input and processes a new "Book In" transaction for the selected room.
+     */
     public void bookInRoom() {
         if (currentSelected == null) {
             JOptionPane.showMessageDialog(system, "Kindly choose a room in the table ! ", "You can't choose", JOptionPane.WARNING_MESSAGE);
@@ -203,7 +242,9 @@ public class RoomFormHandler {
         JOptionPane.showMessageDialog(system, "This room is booking in " + currentSelected.getRoomNo() + ".", "Book In Successful", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Kini nga method nag-proseso sa "Book Out" nga request, naglimpyo sa data sa bisita
+    /**
+     * Confirms and processes a "Book Out" request, resetting the room and clearing guest information.
+     */
     public void bookOutRoom() {
         Room roomToBookOut = currentSelected;
         if (roomToBookOut == null) {
@@ -230,7 +271,9 @@ public class RoomFormHandler {
         JOptionPane.showMessageDialog(system, "Booking out process completed ! ", "Book Out Successful", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Kini nga method nag-save o nag-update sa data sa kwarto gikan sa form ngadto sa inventory
+    /**
+     * Saves or updates the details of a room within the system's inventory based on form inputs.
+     */
     public void saveRoom() {
         String name = txtName.getText();
         String type = cbCategory.getSelectedItem().toString();
@@ -275,4 +318,5 @@ public class RoomFormHandler {
     //  Getters & Setters
     public Room getCurrentSelected() { return currentSelected; }
     public void setCurrentSelected(Room r) { this.currentSelected = r; }
+    public boolean isUpdating() { return isUpdating; }
 }

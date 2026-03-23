@@ -2,41 +2,40 @@
 import java.util.Date;
 
 /**
- * Kini nga class nga Room kay usa ka data model nga nagrepresentar sa usa ka
- * kwarto sa hotel. Kini nagtipig sa tanang impormasyon nga may kalabutan sa
- * status sa kwarto, mga detalye sa bisita, ug presyo
+ * Data model representing a single hotel room, including its properties and booking information.
+ * Stores all relevant information such as room status, guest details, pricing, and stay duration.
  */
 public class Room {
 
-    // Talagsaon nga identifier para sa kwarto
+    // Unique identifier (room number) for the room
     private int roomNo;
-    // Deskriptibong ngalan sa kwarto
+    // Descriptive name or label for the room
     private String name;
-    // Kategorya sa kwarto (VIP, Double Bed, Family)
+    // Category or type of the room (e.g., VIP, Family, Couple)
     private String type;
-    // Status sa pagka-anaa karon (Free, Booked)
+    // Current operational status of the room (e.g., Free, Booked)
     private String status;
-    // Base nga presyo kada gabii
+    // Standard nightly rate for the room
     private String price;
-    // Napili nga pamaagi sa pagbayad
+    // The payment method chosen by the guest (e.g., Cash, Card)
     private String paymentMethod;
-    // Ang petsa ug oras kung kanus-a ni-check in ang bisita
+    // Timestamp indicating when the guest officially checked into the room
     private Date bookedAt;
-    // Ang petsa ug oras kung kanus-a gilauman nga mo-check out ang bisita
+    // Timestamp indicating the scheduled check-out date and time
     private Date bookOutAt;
-    // Ngalan sa bisita nga nagpuyo sa kwarto
+    // Full name of the primary guest currently occupying the room
     private String guestName;
-    // Gidaghanon sa mga gabii nga magpuyo ang bisita
+    // Total number of nights the guest has booked for their stay
     private int nights;
-    // Bisan unsang kantidad sa discount nga gi-apply sa booking
+    // Discount amount applied to the total booking cost
     private double discount;
-    // Kinatibuk-ang kantidad sa bayad nga gikalkula para sa pagpuyo
+    // The final calculated total cost for the entire stay
     private double total;
-    // Gidaghanon sa mga bisita nga nagpuyo sa kwarto
+    // Total number of guests occupying the room during the stay
     private int guestCount;
 
     public Room(int roomNo, String name, String type, String status, String price, String paymentMethod, String guestName) {
-        // Nag-initialize sa room object uban ang mga core nga detalye
+        // Constructor that initializes a new Room object with its essential information
         this.roomNo = roomNo;
         this.name = name;
         this.type = type;
@@ -44,14 +43,14 @@ public class Room {
         this.price = price;
         this.paymentMethod = paymentMethod;
         this.guestName = guestName;
-        // Nag-set sa mga default nga value para sa usa ka bag-ong booking
+        // Sets initial default values for booking-related fields
         this.nights = 1;
         this.discount = 0.0;
         this.total = 0.0;
         this.guestCount = 0;
     }
 
-    // Kini nga seksyon adunay mga Getter para makuha ang impormasyon sa kwarto
+    // Standard getter methods to retrieve the room's current property values
     public int getRoomNo() {
         return roomNo;
     }
@@ -104,7 +103,7 @@ public class Room {
         return guestCount;
     }
 
-    // Kini nga seksyon adunay mga Setter para ma-update ang impormasyon sa kwarto
+    // Standard setter methods to update the room's property values
     public void setName(String name) {
         this.name = name;
     }

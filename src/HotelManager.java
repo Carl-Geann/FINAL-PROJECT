@@ -4,54 +4,54 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Kini nga class nga HotelManager kay para sa pagdumala sa koleksyon sa mga kwarto ug business logic
- * Kini ang nag-handle sa pagdugang, pag-update, pag-book, ug pag-filter sa mga kwarto sa hotel
+ * Manages the collection of hotel rooms and implements core business logic.
+ * Handles operations such as adding, updating, booking, and filtering rooms within the hotel system.
  */
 public class HotelManager {
-    // Kini nga listahan nagtipig sa tanang mga kwarto nga anaa karon sa inventory sa hotel
+    // Stores the complete list of rooms available in the hotel's inventory.
     private ArrayList<Room> rooms;
 
     public HotelManager() {
         this.rooms = new ArrayList<>();
-        // Nagbutang sa inisyal nga set sa mga kwarto sa dihang gihimo ang manager
+        // Initializes the room inventory with a default set of rooms when the manager is instantiated.
         seedInventory();
     }
 
-    // Kini nga method nag-return sa kompleto nga listahan sa mga kwarto
+    // Retrieves the full list of all rooms managed by the hotel.
     public List<Room> getAllRooms() {
         return rooms;
     }
 
-    // Kini nga method nag-return lamang sa mga kwarto nga gi-book karon sa mga bisita
+    // Returns a list of rooms that are currently occupied or reserved by guests.
     public List<Room> getBookedRooms() {
         return rooms.stream()
                 .filter(r -> "Booked".equals(r.getStatus()) && r.getGuestName() != null && !r.getGuestName().trim().isEmpty())
                 .collect(Collectors.toList());
     }
 
-    // Kini nga method nangita og piho nga kwarto gamit ang iyang talagsaon nga numero sa kwarto
+    // Searches for and returns a specific room based on its unique room number.
     public Room findRoomByNo(int roomNo) {
         return rooms.stream().filter(r -> r.getRoomNo() == roomNo).findFirst().orElse(null);
     }
 
-    // Kini nga method nangita og kwarto pinaagi sa iyang deskriptibong ngalan
+    // Searches for and returns a room based on its descriptive name.
     public Room findRoomByName(String name) {
         return rooms.stream().filter(r -> r.getName().equals(name)).findFirst().orElse(null);
     }
 
-    // Kini nga method nag-generate sa sunod nga anaa nga numero sa kwarto
+    // Calculates and returns the next available unique room number for a new room.
     private int nextRoomNo() {
         return rooms.stream().mapToInt(Room::getRoomNo).max().orElse(0) + 1;
     }
 
-    // Kini nga method nagpuno sa inisyal nga inventory sa mga kwarto para sa lain-laing mga kategorya
+    // Populates the hotel inventory with an initial set of rooms for various categories (e.g., VIP, Family, Couple).
     private void seedInventory() {
         seedType("VIP BED", "VIP", 20, "100");
         seedType("FAMILY BED", "Family", 20, "80");
         seedType("COUPLE BED", "Couple", 20, "60");
     }
 
-    // Kini nga method helper naghimo og daghang mga kwarto sa usa ka piho nga klase
+    // A helper method that creates a specified number of rooms for a given room type.
     private void seedType(String type, String base, int count, String price) {
         for (int i = 1; i <= count; i++) {
             String name = base + " " + i;
@@ -61,7 +61,7 @@ public class HotelManager {
         }
     }
 
-    // Kini nga method naga-update sa mga detalye sa usa ka anaa na nga kwarto
+    // Updates the information and status of an existing room object.
     public void updateRoom(Room target, String name, String type, String status, String price, 
                            String paymentMethod, String guestName, Date bookedAt, Date bookOutAt, 
                            int nights, double discount, double total, int guestCount) {
@@ -81,7 +81,7 @@ public class HotelManager {
         }
     }
 
-    // Kini nga method nagdugang og bag-ong kwarto sa sistema nga adunay kompleto nga mga detalye
+    // Adds a new room with all its associated details to the hotel's inventory.
     public void addRoom(int roomNo, String name, String type, String status, String price, 
                         String paymentMethod, String guestName, Date bookedAt, Date bookOutAt, 
                         int nights, double discount, double total, int guestCount) {
@@ -95,7 +95,7 @@ public class HotelManager {
         rooms.add(room);
     }
 
-    // Kini nga method nag-proseso sa aksyon nga "Book In" para sa usa ka bisita
+    // Processes the check-in operation for a guest, updating the room's status and booking details.
     public void bookInRoom(Room room, String guestName, String paymentMethod, int nights, 
                            int guestCount, double discount, Date bookedAt, double total) {
         room.setStatus("Booked");
@@ -106,7 +106,7 @@ public class HotelManager {
         room.setDiscount(discount);
         room.setBookedAt(bookedAt);
         
-        // Awtomatiko nga kalkulasyon sa book out date base sa bookedAt ug nights
+        // Automatically calculates the expected check-out date based on the check-in date and number of nights.
         if (bookedAt != null) {
             java.util.Calendar cal = java.util.Calendar.getInstance();
             cal.setTime(bookedAt);
@@ -119,7 +119,7 @@ public class HotelManager {
         room.setTotal(total);
     }
 
-    // Kini nga method nag-proseso sa aksyon nga "Book Out", nag-reset sa kwarto ngadto sa 'Free'
+    // Processes the check-out operation, resetting the room status to 'Free' and clearing guest information.
     public void bookOutRoom(Room room) {
         room.setGuestName("");
         room.setBookedAt(null);
@@ -135,26 +135,26 @@ public class HotelManager {
         room.setName(baseForType(room.getType()) + " " + idx);
     }
 
-    // Kini nga method nagkalkula sa kinatibuk-ang bayad base sa presyo, nights, discount, ug guest count
+    // Calculates the total booking cost considering the base price, number of nights, applied discounts, and guest count.
     public double calculateTotal(double price, int nights, double discount, int guestCount) {
-        // Ang calculation kay: (Presyo *  Gabii) + (Presyo *  Bisita) - Discount
+        // Formula: (Price * Nights) + (Price * Guest Count) - Discount
         return (price * nights) + (price * guestCount) - discount;
     }
-    // Kini nga method naghatag sa default nga presyo para sa matag kategorya sa kwarto
+    // Returns the standard nightly price for a specific room category.
     public String defaultPriceForType(String type) {
         if ("VIP BED".equals(type)) return "100";
         if ("FAMILY BED".equals(type)) return "80";
         if ("COUPLE BED".equals(type)) return "60";
         return "60";
     }
-    // Kini nga method naghatag sa base nga prefix sa ngalan para sa matag klase sa kwarto
+    // Returns the naming prefix (e.g., "VIP", "Family") for a given room type.
     public String baseForType(String type) {
         if ("VIP BED".equals(type)) return "VIP";
         if ("FAMILY BED".equals(type)) return "Family";
         if ("COUPLE BED".equals(type)) return "Couple";
         return "Double";
     }
-    // Kini nga method nag-define sa range sa numero sa kwarto para sa matag kategorya
+    // Returns the defined range of room numbers for each specific room category.
     public int[] rangeForType(String type) {
         if ("VIP BED".equalsIgnoreCase(type)) return new int[]{1, 20};
         if ("FAMILY BED".equalsIgnoreCase(type)) return new int[]{21, 40};
@@ -162,13 +162,13 @@ public class HotelManager {
         return new int[]{1, 60};
     }
 
-    // Kini nga method nagkalkula sa relative nga index sulod sa range sa usa ka klase sa kwarto
+    // Calculates the relative position or index of a room within its category's range.
     public int indexForTypeRoomNo(String type, int roomNo) {
         int[] r = rangeForType(type);
         return roomNo - r[0] + 1;
     }
 
-    // Kini nga method nag-filter sa listahan sa mga kwarto base sa query string sa tanang mga field
+    // Searches through all room fields and returns a list of rooms that match the provided search query.
     public List<Room> searchRooms(String query) {
         if (query == null || query.trim().isEmpty()) {
             return getAllRooms();

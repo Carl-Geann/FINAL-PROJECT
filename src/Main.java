@@ -1,31 +1,32 @@
 import javax.swing.SwingUtilities;
 
 /**
- * Kini nga class nga Main mao ang entry point sa tibuok application
- * Kini ang nag-coordinate sa pag-launch sa LoginDialog ug sa main HotelReservationSystem
+ * The primary entry point for launching the Hotel Reservation System application.
+ * Coordinates the initialization and display of the login dialog and the main dashboard.
  */
 public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            // Pag-initialize sa main system frame.
+            // Instantiates the main HotelReservationSystem frame.
             HotelReservationSystem system = new HotelReservationSystem();
             
-            // Pagpakita sa login dialog sa dili pa ablihan ang main dashboard
-            // Ang system.authManager gigamit para sa pag-verify sa credentials
+            // Displays the login dialog to verify user credentials before opening the main dashboard.
+            // The system's authManager is utilized for credential validation.
             LoginDialog login = new LoginDialog(system, system.authManager);
             login.setVisible(true);
             
-            //  access for authentication, i-setup ang user session ug ipakita ang main frame
+            // If authentication is successful, set up the user session and display the main frame.
             if (login.isAuthenticated()) {
                 system.setSignedIn(true);
                 system.setCurrentUser(login.getLoggedInUser());
                 system.updateAuthUI();
-                system.roomUpdateTable(); // Sigurohon nga updated ang table pagkahuman og login
+                system.roomUpdateTable(); // Refreshes the table data immediately after a successful login.
                 system.setVisible(true);
             } else {
-                //  i-close ang login window nga wala ka-authenticate, i-exit ang program
+                // If the login window is closed without authentication, terminate the application.
                 System.exit(0);
             }
         });
     }
 }
+

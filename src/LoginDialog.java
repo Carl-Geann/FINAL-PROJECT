@@ -5,8 +5,8 @@ import java.awt.event.ActionListener;
 import java.util.Map;
 
 /**
- * Kini nga class nga LoginDialog kay para sa pagpakita sa login screen sa hotel.
- * Kini ang nag-verify sa user credentials sa dili pa ma-access ang main system.
+ * UI dialog class that displays the hotel system's login screen to the user.
+ * Validates user credentials against the AuthManager before granting access to the main application.
  */
 public class LoginDialog extends JDialog {
     private JTextField txtUsername;
@@ -15,31 +15,31 @@ public class LoginDialog extends JDialog {
     private JButton btnLogin, btnExit;
     private boolean authenticated = false;
     private String loggedInUser;
-    private AuthManager authManager; // Kini ang tigdumala sa authentication logic
+    private AuthManager authManager; // Reference to the AuthManager which handles the core authentication business logic
 
     public LoginDialog(JFrame parent, AuthManager authManager) {
         super(parent, "Hotel Login", true);
         this.authManager = authManager;
         
-        // Kini nga code nag-set sa size sa login dialog 
+        // Configures the dimensions and initial properties of the login dialog window.
         setSize(1200, 700);
-        setLocationRelativeTo(null); // I-sentro ang window sa screen.
-        setUndecorated(false); // Ipakita ang title bar ug window controls.
+        setLocationRelativeTo(null); // Centers the login dialog window on the screen.
+        setUndecorated(false); // Configures the window to display standard OS title bars and control buttons.
         setResizable(false); 
         setLayout(new BorderLayout());
 
-        // Kini nga code nag-set sa icon sa window
+        // Loads and applies a custom icon to the login dialog's window frame.
         ImageIcon windowIcon = getScaledIcon("logo.png", 48, 48);
         if (windowIcon != null) {
-            setIconImage(windowIcon.getImage()); // I-set ang gamay nga logo sa window title bar
+            setIconImage(windowIcon.getImage()); // Sets the application logo as the small icon in the window title bar.
         }
 
         // Color theme para sa login (Red matching the hotel theme)
-        Color themeRed = new Color(150, 0, 0); // Pula nga theme
-        Color lightYellow = new Color(255, 255, 240); // Dalag nga background sa login box
-        Color textColor = Color.WHITE; // Puti nga text
+        Color themeRed = new Color(150, 0, 0); // Primary red theme color.
+        Color lightYellow = new Color(255, 255, 240); // Secondary yellow background color for the login box.
+        Color textColor = Color.WHITE; // Standard white text color.
 
-        // Trade Gothic Fonts - Kini ang mga font nga gamiton
+        // Font configuration section defining the typography styles for the login interface.
         Font fontHeader = new Font("Brush Script MT", Font.BOLD, 72); 
         if (fontHeader.getFamily().equals("Dialog")) fontHeader = new Font("Comic Sans MS", Font.BOLD, 72); 
         
@@ -52,12 +52,12 @@ public class LoginDialog extends JDialog {
         Font fontButton = new Font("Trade Gothic", Font.BOLD, 18);
         if (fontButton.getFamily().equals("Dialog")) fontButton = new Font("Arial", Font.BOLD, 18);
 
-        // Header Panel - Kini ang panel sa ibabaw nga bahin diin makita ang logo ug ngalan sa hotel
+        // Header Panel - The top section of the dialog displaying the hotel's branding and logo.
         JPanel headerPanel = new JPanel(new GridBagLayout());
         headerPanel.setBackground(themeRed);
         headerPanel.setPreferredSize(new Dimension(0, 220)); 
 
-        // Kini nga code nagdugang og dako nga logo sa header
+        // Loads and adds a prominent version of the hotel logo to the header panel.
         ImageIcon logoIcon = getScaledIcon("logo.png", 200, 200); 
         if (logoIcon != null) {
             JLabel lblLogo = new JLabel(logoIcon);
@@ -71,7 +71,7 @@ public class LoginDialog extends JDialog {
         lblHeader.setForeground(textColor);
         headerPanel.add(lblHeader);
 
-        // Center Wrapper Panel - Kini ang background panel nga naay hulagway
+        // Center Wrapper Panel - The central container that features a custom-drawn background image.
         JPanel centerWrapper = new JPanel(new GridBagLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -80,24 +80,24 @@ public class LoginDialog extends JDialog {
                 if (imgURL != null) {
                     ImageIcon icon = new ImageIcon(imgURL);
                     Image img = icon.getImage();
-                    // I-stretch ang background image sa tibuok panel
+                    // Custom painting logic to scale the background image to fit the panel's dimensions.
                     g.drawImage(img, 0, 0, getWidth(), getHeight(), null);
                 }
             }
         };
         centerWrapper.setBackground(themeRed);
 
-        // Login Box - Kini ang puti/dalag nga box diin mag-input ang user
+        // Login Box - Stylized container for the credential input fields.
         JPanel loginBox = new JPanel(new BorderLayout(0, 10)) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(getBackground());
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30); // I-round ang mga kanto sa box
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30); // Applies anti-aliased rounded corners to the login box.
                 g2.setColor(Color.YELLOW);
                 g2.setStroke(new BasicStroke(3));
-                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 30, 30); // Butangan og yellow nga border
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 30, 30); // Draws a thick yellow border around the perimeter.
                 g2.dispose();
             }
         };
@@ -106,7 +106,7 @@ public class LoginDialog extends JDialog {
         loginBox.setPreferredSize(new Dimension(500, 320)); 
         loginBox.setBorder(BorderFactory.createEmptyBorder(20, 35, 20, 35));
 
-        // Form Panel inside Login Box - Kini ang sudlanan sa username ug password fields
+        // Form Panel inside Login Box - Internal layout container for organizing input fields.
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -136,7 +136,7 @@ public class LoginDialog extends JDialog {
         txtUsername.setBackground(Color.WHITE);
         txtUsername.setBorder(BorderFactory.createLineBorder(Color.RED, 2)); 
         txtUsername.setPreferredSize(new Dimension(280, 32)); 
-        addFocusEffect(txtUsername, themeRed); // Butangan og effect inig click
+        addFocusEffect(txtUsername, themeRed); // Attaches visual feedback listeners for interaction.
         formPanel.add(txtUsername, gbc);
 
         // Password Label ug Field
@@ -162,10 +162,10 @@ public class LoginDialog extends JDialog {
         txtPassword.setBackground(Color.WHITE);
         txtPassword.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
         txtPassword.setPreferredSize(new Dimension(280, 32)); 
-        addFocusEffect(txtPassword, themeRed); // Butangan og effect inig click
+        addFocusEffect(txtPassword, themeRed); // Attaches visual feedback listeners for interaction.
         formPanel.add(txtPassword, gbc);
 
-        // Show/Hide Password Toggle Label - Kini ang clickable text para makita ang password
+        // Show/Hide Password Toggle Label - Clickable text to toggle password visibility.
         gbc.gridx = 1; gbc.gridy = 2;
         JPanel toggleContainer = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         toggleContainer.setOpaque(false);
@@ -179,7 +179,7 @@ public class LoginDialog extends JDialog {
         lblShowPassword.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
-                // I-toggle ang visibility sa password
+                // Implementation logic for switching between masked and plain-text password display.
                 if (lblShowPassword.getText().equals("Show Password")) {
                     txtPassword.setEchoChar((char) 0);
                     lblShowPassword.setText("Hide Password");
@@ -200,7 +200,7 @@ public class LoginDialog extends JDialog {
         toggleContainer.add(lblShowPassword);
         formPanel.add(toggleContainer, gbc);
 
-        // Buttons Panel inside Login Box - Kini ang sudlanan sa Login ug Exit buttons
+        // Buttons Panel inside Login Box - Container for primary action buttons.
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0)); 
         buttonPanel.setOpaque(false);
 
@@ -212,7 +212,7 @@ public class LoginDialog extends JDialog {
         btnLogin.setPreferredSize(new Dimension(120, 40)); 
         btnLogin.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 2));
         
-        // Hover effect para sa Login Button
+        // Attaches visual feedback and cursor changes when hovering over the Login button.
         btnLogin.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 btnLogin.setBackground(Color.RED);
@@ -231,7 +231,7 @@ public class LoginDialog extends JDialog {
         btnExit.setPreferredSize(new Dimension(120, 40));
         btnExit.setBorder(BorderFactory.createLineBorder(Color.YELLOW, 2));
 
-        // Hover effect para sa Exit Button
+        // Attaches visual feedback and cursor changes when hovering over the Exit button.
         btnExit.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 btnExit.setBackground(new Color(100, 0, 0));
@@ -254,38 +254,38 @@ public class LoginDialog extends JDialog {
         add(headerPanel, BorderLayout.NORTH);
         add(centerWrapper, BorderLayout.CENTER);
 
-        // Footer Panel - Ang panel sa ubos nga bahin
+        // Footer Panel - The bottom section providing visual balance.
         JPanel footerPanel = new JPanel();
         footerPanel.setBackground(themeRed);
         footerPanel.setPreferredSize(new Dimension(0, 60)); 
         footerPanel.setBorder(BorderFactory.createMatteBorder(3, 0, 0, 0, Color.YELLOW)); 
         add(footerPanel, BorderLayout.SOUTH);
 
-        // Login Button Logic - Kini ang logic inig click sa Login button
+        // Defines the action listener for verifying user credentials and handling logins.
         btnLogin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String user = txtUsername.getText();
                 String pass = new String(txtPassword.getPassword());
 
-                // I-check kung husto ba ang username ug password
+                // Compares user-entered credentials against the registered accounts in the AuthManager.
                 Map<String, String> users = authManager.getUsers();
                 if (users.containsKey(user) && users.get(user).equals(pass)) {
                     authenticated = true;
                     loggedInUser = user;
-                    dispose(); // Isira ang login dialog kung malampuson
+                    dispose(); // Closes the login window and proceeds upon successful authentication.
                 } else {
-                    // Ipakita ang error message kung sayop
+                    // Displays a popup alert informing the user of incorrect login credentials.
                     JOptionPane.showMessageDialog(LoginDialog.this, 
                         "Wrong email or password!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
-        // Exit Button Logic - Kini ang logic inig click sa Exit button
+        // Defines the action listener for terminating the application.
         btnExit.addActionListener(e -> {
             authenticated = false;
-            System.exit(0); // I-close ang tibuok application
+            System.exit(0); // Terminates the JVM and exits the program.
         });
     }
 
@@ -297,7 +297,7 @@ public class LoginDialog extends JDialog {
         return loggedInUser;
     }
 
-    // Kini nga method kay para sa pag-load ug pag-scale sa mga icon
+    // Helper method to load images from resources and scale them to specific dimensions.
     private ImageIcon getScaledIcon(String path, int width, int height) {
         try {
             java.net.URL imgURL = getClass().getResource("/pic/" + path);
@@ -312,12 +312,12 @@ public class LoginDialog extends JDialog {
         return null;
     }
 
-    // Kini nga method nagdugang og visual effect inig click o hover sa mga input field
+    // Attaches focus and mouse listeners to UI components to provide interactive visual feedback.
     private void addFocusEffect(JComponent c, Color defaultColor) {
         c.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
             public void focusGained(java.awt.event.FocusEvent e) {
-                c.setBorder(BorderFactory.createLineBorder(Color.RED, 2)); // Pula nga border inig focus
+                c.setBorder(BorderFactory.createLineBorder(Color.RED, 2)); // Red border when focused.
             }
             @Override
             public void focusLost(java.awt.event.FocusEvent e) {
@@ -328,7 +328,7 @@ public class LoginDialog extends JDialog {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 if (!c.isFocusOwner()) {
-                    c.setBorder(BorderFactory.createLineBorder(Color.RED, 2)); // Pula nga border inig hover
+                    c.setBorder(BorderFactory.createLineBorder(Color.RED, 2)); // Red border when hovering.
                 }
             }
             @Override
@@ -340,3 +340,4 @@ public class LoginDialog extends JDialog {
         });
     }
 }
+
